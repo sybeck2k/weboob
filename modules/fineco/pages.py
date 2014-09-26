@@ -147,11 +147,9 @@ class OperationsPage(BasePage):
             if operation_data[2] == '':
                 del operation_data[2]
 
-            self.logger.debug('Found transaction:' % operation_data)
+            self.logger.debug('Found transaction: {0}'.format(operation_data))
 
-            raw = u' '.join(operation_data[2:-1])
-            print raw
-            
+            raw = u' '.join(operation_data[2:-1])        
 
             operation.parse(date=operation_data[0], vdate=operation_data[1], raw=raw)
 
