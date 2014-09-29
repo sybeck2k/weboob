@@ -25,8 +25,7 @@ import re
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 import datetime
-from lxml import etree
-import inspect
+import hashlib
 
 from weboob.tools.browser import BasePage, BrowserIncorrectPassword, BrokenPageError
 from weboob.tools.ordereddict import OrderedDict
@@ -130,13 +129,9 @@ class OperationsPage(BasePage):
 
             self.browser.submit(nologin=True)
         
-        index = 0
         trs = self.browser.page.document.getroot().cssselect('table#FormID tbody tr')
 
-        for tr,tr_detail in zip(trs[0::2], trs[1::2]):
-            operation = Transaction(index)
-            index += 1
-            
+        for tr,tr_detail in zip(trs[0::2], trs[1::2]):            
             operation_data = []
             for td in tr.iterdescendants():
                 innerText = td.text
@@ -149,11 +144,11 @@ class OperationsPage(BasePage):
 
             self.logger.debug('Found transaction: {0}'.format(operation_data))
 
-            raw = u' '.join(operation_data[2:-1])        
-
+            raw = u' '.join(operation_data[2:-1])       
+            uid = hashlib.md5(operation_data[0] + operation_data[1] + operation_data[6] + operation_data[5]).hexdigest()
+            operation = Transaction(uid)
             operation.parse(date=operation_data[0], vdate=operation_data[1], raw=raw)
 
-            #raise Error()
             operator = operation_data[6][0]
             operation_amount = operation_data[6][1:]
 
