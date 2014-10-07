@@ -20,8 +20,8 @@
 
 import re
 
-from weboob.tools.browser2 import DomainBrowser, HTMLPage, Profile
-from weboob.tools.exceptions import BrowserIncorrectPassword
+from weboob.browser2 import DomainBrowser, HTMLPage, Profile
+from weboob.core.exceptions import BrowserIncorrectPassword
 from weboob.tools.json import json
 
 

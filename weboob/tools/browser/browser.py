@@ -49,7 +49,7 @@ from contextlib import closing
 from gzip import GzipFile
 import warnings
 
-from weboob.tools.exceptions import BrowserUnavailable, BrowserIncorrectPassword, BrowserPasswordExpired, BrowserForbidden, BrowserBanned, BrowserHTTPNotFound, BrowserHTTPError, FormFieldConversionWarning, BrowserSSLError
+from weboob.core.exceptions import BrowserUnavailable, BrowserIncorrectPassword, BrowserPasswordExpired, BrowserForbidden, BrowserBanned, BrowserHTTPNotFound, BrowserHTTPError, FormFieldConversionWarning, BrowserSSLError
 from weboob.tools.decorators import retry
 from weboob.tools.log import getLogger
 from weboob.tools.mech import ClientForm
@@ -57,8 +57,8 @@ ControlNotFoundError = ClientForm.ControlNotFoundError
 from weboob.tools.parsers import get_parser
 
 __all__ = ['BrowserIncorrectPassword', 'BrowserForbidden', 'BrowserBanned', 'BrowserUnavailable', 'BrowserRetry',
-           'BrowserPasswordExpired', 'BrowserHTTPNotFound', 'BrowserHTTPError', 'BrokenPageError', 'BasePage',
-           'StandardBrowser', 'BaseBrowser']
+           'BrowserPasswordExpired', 'BrowserHTTPNotFound', 'BrowserHTTPError', 'BrokenPageError', 'Page',
+           'StandardBrowser', 'Browser']
 
 
 class BrowserRetry(Exception):
@@ -89,7 +89,7 @@ class BrokenPageError(Exception):
     pass
 
 
-class BasePage(object):
+class Page(object):
     """
     Base page
     """
@@ -422,7 +422,7 @@ class StandardBrowser(mechanize.Browser):
 
 
 
-class BaseBrowser(StandardBrowser):
+class Browser(StandardBrowser):
     """
     Base browser class to navigate on a website.
 
@@ -526,7 +526,7 @@ class BaseBrowser(StandardBrowser):
         Check the current page.
 
         :param pageCls: class of the page to check
-        :type pageCls: :class:`BasePage`
+        :type pageCls: :class:`Page`
         :rtype: bool
         """
         return isinstance(self.page, pageCls)

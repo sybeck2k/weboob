@@ -32,12 +32,12 @@ from weboob.capabilities.base import ConversionWarning, BaseObject
 from weboob.core import Weboob, CallErrors
 from weboob.core.backendscfg import BackendsConfig
 from weboob.tools.config.iconfig import ConfigError
-from weboob.tools.exceptions import FormFieldConversionWarning
-from weboob.tools.log import createColoredFormatter, getLogger, settings as log_settings
+from weboob.core.exceptions import FormFieldConversionWarning
+from weboob.tools.log import createColoredFormatter, getLogger, DebugFilter, settings as log_settings
 from weboob.tools.misc import to_unicode
 from .results import ResultsConditionError
 
-__all__ = ['BaseApplication']
+__all__ = ['Application']
 
 
 class MoreResultsAvailable(Exception):
@@ -72,7 +72,7 @@ class ApplicationStorage(object):
             return self.storage.save('applications', self.name)
 
 
-class BaseApplication(object):
+class Application(object):
     """
     Base application.
 
@@ -99,6 +99,8 @@ class BaseApplication(object):
     VERSION = None
     # Copyright
     COPYRIGHT = None
+    # Verbosity of DEBUG
+    DEBUG_FILTER = 2
 
     stdin = sys.stdin
     stdout = sys.stdout
@@ -136,7 +138,7 @@ class BaseApplication(object):
         """
         pass
 
-    # ------ BaseApplication methods -------------------------------
+    # ------ Application methods -------------------------------
 
     def __init__(self, option_parser=None):
         self.encoding = self.guess_encoding()
@@ -162,7 +164,7 @@ class BaseApplication(object):
         self._parser.add_option('-e', '--exclude-backends', help='what backend(s) to exclude (comma separated)')
         self._parser.add_option('-I', '--insecure', action='store_true', help='do not validate SSL')
         logging_options = OptionGroup(self._parser, 'Logging Options')
-        logging_options.add_option('-d', '--debug', action='store_true', help='display debug messages')
+        logging_options.add_option('-d', '--debug', action='count', help='display debug messages')
         logging_options.add_option('-q', '--quiet', action='store_true', help='display only error messages')
         logging_options.add_option('-v', '--verbose', action='store_true', help='display info messages')
         logging_options.add_option('--logging-file', action='store', type='string', dest='logging_file', help='file to save logs')
@@ -388,6 +390,10 @@ class BaseApplication(object):
 
         self._handle_options()
         self.handle_application_options()
+
+        if self.options.debug < self.DEBUG_FILTER:
+            for handler in handlers:
+                handler.addFilter(DebugFilter())
 
         return args
 

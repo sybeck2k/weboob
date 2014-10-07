@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from weboob.tools.exceptions import BrowserBanned
-from weboob.tools.browser2.page import HTMLPage, LoggedPage, method, pagination
-from weboob.tools.browser2.elements import ListElement, ItemElement
-from weboob.tools.browser2.filters import CleanText, CleanDecimal, Field, Attr, DateTime, Link, Format
+from weboob.core.exceptions import BrowserBanned
+from weboob.browser2.page import HTMLPage, LoggedPage, method, pagination
+from weboob.browser2.elements import ListElement, ItemElement
+from weboob.browser2.filters.standard import CleanText, CleanDecimal, Field, DateTime, Format
+from weboob.browser2.filters.html import Attr, Link
 from weboob.capabilities.bill import Subscription, Detail
 
 

@@ -18,9 +18,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import urllib
 
-from weboob.tools.browser import BaseBrowser, BrowserIncorrectPassword, BrowserUnavailable,\
+from weboob.tools.browser import Browser, BrowserIncorrectPassword, BrowserUnavailable,\
         BrowserBanned
 from weboob.tools.browser.decorators import id2url
 
@@ -36,7 +38,7 @@ from weboob.capabilities.base import NotAvailable
 __all__ = ['GDCVaultBrowser']
 
 
-class GDCVaultBrowser(BaseBrowser):
+class GDCVaultBrowser(Browser):
     DOMAIN = 'gdcvault.com'
     ENCODING = 'utf-8'
     PAGES = {r'http://[w\.]*gdcvault.com/play/(?P<id>[\d]+)/?.*': VideoPage,
@@ -149,7 +151,7 @@ class GDCVaultBrowser(BaseBrowser):
         return self.page.iter_videos()
 
     def latest_videos(self):
-        print "browser:latest_videos()"
+        print("browser:latest_videos()")
         #self.home()
         self.location('/free')
         assert self.is_on_page(IndexPage)

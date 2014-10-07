@@ -1,15 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
-from weboob.tools.application.base import BaseApplication
+from weboob.tools.application.base import Application
 import os
 import re
 import subprocess
 
 
-class Weboobmc(BaseApplication):
+class Weboobmc(Application):
     def __init__(self, count=10):
-        BaseApplication.__init__(self)
+        Application.__init__(self)
         self.count = int(count)
         self._is_default_count = False
 
@@ -53,7 +54,7 @@ class Weboobmc(BaseApplication):
             with open('/dev/null', 'w') as devnull:
                 process = subprocess.Popen(['which', executable], stdout=devnull)
                 if process.wait() != 0:
-                    print 'Please install "%s"' % executable
+                    print('Please install "%s"' % executable)
                     return False
             return True
 

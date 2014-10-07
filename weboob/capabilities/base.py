@@ -29,7 +29,7 @@ from weboob.tools.ordereddict import OrderedDict
 
 
 __all__ = ['UserError', 'FieldNotFound', 'NotAvailable',
-           'NotLoaded', 'CapBase', 'Field', 'IntField', 'DecimalField',
+           'NotLoaded', 'Capability', 'Field', 'IntField', 'DecimalField',
            'FloatField', 'StringField', 'BytesField',
            'empty', 'BaseObject']
 
@@ -127,7 +127,7 @@ class NotLoadedType(object):
     """
     NotLoaded is a constant to use on not loaded fields.
 
-    When you use :func:`weboob.tools.backend.BaseBackend.fillobj` on a object based on :class:`BaseObject`,
+    When you use :func:`weboob.tools.backend.Module.fillobj` on a object based on :class:`BaseObject`,
     it will request all fields with this value.
     """
 
@@ -152,7 +152,7 @@ class NotLoadedType(object):
 NotLoaded = NotLoadedType()
 
 
-class CapBase(object):
+class Capability(object):
     """
     This is the base class for all capabilities.
 

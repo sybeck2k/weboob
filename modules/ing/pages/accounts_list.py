@@ -24,9 +24,10 @@ import re
 
 from weboob.capabilities.bank import Account
 from weboob.capabilities.base import NotAvailable
-from weboob.tools.browser2.page import HTMLPage, LoggedPage, method
-from weboob.tools.browser2.elements import ListElement, ItemElement
-from weboob.tools.browser2.filters import Attr, CleanText, CleanDecimal, Filter, Field, MultiFilter, Date, Lower
+from weboob.browser2.page import HTMLPage, LoggedPage, method
+from weboob.browser2.elements import ListElement, ItemElement
+from weboob.browser2.filters.standard import CleanText, CleanDecimal, Filter, Field, MultiFilter, Date, Lower
+from weboob.browser2.filters.html import Attr
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
 
 
@@ -146,7 +147,7 @@ class AccountsList(LoggedPage, HTMLPage):
             def condition(self):
                 if self.el.find('.//td[@class="date"]') is None:
                     return False
-                if self.env['index'] > 0 and self.page.i < self.env['index']:
+                if 'index' in self.env and self.env['index'] > 0 and self.page.i < self.env['index']:
                     self.page.i += 1
                     return False
                 return True

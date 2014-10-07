@@ -31,8 +31,8 @@ from contextlib import closing
 from compileall import compile_dir
 from io import BytesIO
 
-from weboob.tools.exceptions import BrowserHTTPError, BrowserHTTPNotFound
-from .modules import Module
+from weboob.core.exceptions import BrowserHTTPError, BrowserHTTPNotFound
+from .modules import LoadedModule
 from weboob.tools.log import getLogger
 from weboob.tools.misc import to_unicode
 try:
@@ -281,7 +281,7 @@ class Repository(object):
             try:
                 fp, pathname, description = imp.find_module(name, [path])
                 try:
-                    module = Module(imp.load_module(name, fp, pathname, description))
+                    module = LoadedModule(imp.load_module(name, fp, pathname, description))
                 finally:
                     if fp:
                         fp.close()
@@ -442,8 +442,8 @@ class Repositories(object):
             self.load()
 
     def load_browser(self):
-        from weboob.tools.browser2.browser import BaseBrowser, Weboob as WeboobProfile
-        class WeboobBrowser(BaseBrowser):
+        from weboob.browser2.browser import Browser, Weboob as WeboobProfile
+        class WeboobBrowser(Browser):
             PROFILE = WeboobProfile(self.version)
         if self.browser is None:
             self.browser = WeboobBrowser()

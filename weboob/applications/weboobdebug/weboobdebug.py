@@ -17,13 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 
 from optparse import OptionGroup
 
-from weboob.tools.application.base import BaseApplication
+from weboob.tools.application.base import Application
 
 
-class WeboobDebug(BaseApplication):
+class WeboobDebug(Application):
     APPNAME = 'weboobdebug'
     VERSION = '1.0'
     COPYRIGHT = 'Copyright(C) 2010-2011 Christophe Benz'
@@ -48,12 +49,12 @@ class WeboobDebug(BaseApplication):
         try:
             backend_name = argv[1]
         except IndexError:
-            print >>self.stderr, 'Usage: %s BACKEND' % argv[0]
+            print('Usage: %s BACKEND' % argv[0], file=self.stderr)
             return 1
         try:
             backend = self.weboob.load_backends(names=[backend_name])[backend_name]
         except KeyError:
-            print >>self.stderr, u'Unable to load backend "%s"' % backend_name
+            print(u'Unable to load backend "%s"' % backend_name, file=self.stderr)
             return 1
 
         locs = dict(backend=backend, browser=backend.browser, application=self, weboob=self.weboob)

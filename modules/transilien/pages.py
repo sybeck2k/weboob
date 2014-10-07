@@ -18,12 +18,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import re
 
-from weboob.tools.browser2.page import JsonPage, HTMLPage, method
-from weboob.tools.browser2.elements import TableElement, ItemElement, ListElement
+from weboob.browser2.page import JsonPage, HTMLPage, method
+from weboob.browser2.elements import TableElement, ItemElement, ListElement
 from weboob.capabilities.travel import Station, Departure, RoadStep
-from weboob.tools.browser2.filters import Dict, CleanText, TableCell, Filter, DateTime, Env, Link, Regexp, Duration
+from weboob.browser2.filters.standard import CleanText, TableCell, Filter, DateTime, Env, Regexp, Duration
+from weboob.browser2.filters.json import Dict
+from weboob.browser2.filters.html import Link
 from weboob.tools.date import LinearDateGuesser
 
 
@@ -140,7 +144,7 @@ class DeparturesPage2(HTMLPage):
             form['moiHoraire'] = '%s|%s' % (date.month, date.year)
             form['heureHoraire'] = date.hour
             form['minuteHoraire'] = date.minute
-        print form
+        print(form)
         form.submit()
 
 

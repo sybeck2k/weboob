@@ -19,7 +19,7 @@ Select capabilities
 *******************
 
 Each module implements one or many :doc:`capabilities </api/capabilities/index>` to tell what kind of features the
-website provides. A capability is a class derived from :class:`weboob.capabilities.base.CapBase` and with some abstract
+website provides. A capability is a class derived from :class:`weboob.capabilities.base.Capability` and with some abstract
 methods (which raise ``NotImplementedError``).
 
 A capability needs to be as generic as possible to allow a maximum number of modules to implement it.
@@ -63,9 +63,9 @@ For example, use this command::
 
 In a module directory, there are commonly these files:
 
-* **__init__.py** - needed in every python modules, it exports your :class:`BaseBackend <weboob.tools.backend.BaseBackend>` class.
-* **backend.py** - defines the main class of your module, which derives :class:`BaseBackend <weboob.tools.backend.BaseBackend>`.
-* **browser.py** - your browser, derived from :class:`BaseBrowser <weboob.tools.browser2.browser.BaseBrowser>`, is called by your module to interact with the supported website.
+* **__init__.py** - needed in every python modules, it exports your :class:`Module <weboob.tools.backend.Module>` class.
+* **module.py** - defines the main class of your module, which derives :class:`Module <weboob.tools.backend.Module>`.
+* **browser.py** - your browser, derived from :class:`Browser <weboob.browser2.browser.Browser>`, is called by your module to interact with the supported website.
 * **pages.py** - all website's pages handled by the browser are defined here
 * **test.py** - functional tests
 * **favicon.png** - a 64x64 transparent PNG icon
@@ -94,12 +94,12 @@ To be sure your module is correctly added, use this command::
 
 If the last command does not work, check your :doc:`repositories setup </guides/setup>`.
 
-Backend class
+Module class
 *************
 
-Edit ``backend.py``. It contains the main class of the module derived from :class:`BaseBackend <weboob.tools.backend.BaseBackend>` class::
+Edit ``module.py``. It contains the main class of the module derived from :class:`Module <weboob.tools.backend.Module>` class::
 
-    class ExampleBackend(BaseBackend, CapBank):
+    class ExampleModule(Module, CapBank):
         NAME = 'example'                         # The name of module
         DESCRIPTION = u'Example bank website'    # Description of your module
         MAINTAINER = u'John Smith'               # Name of maintainer of this module
@@ -107,7 +107,7 @@ Edit ``backend.py``. It contains the main class of the module derived from :clas
         LICENSE = 'AGPLv3+'                      # License of your module
         VERSION = '0.i'                          # Version of weboob
 
-In the code above, you can see that your ``ExampleBackend`` inherits :class:`CapBank <weboob.capabilities.bank.CapBank>`, as
+In the code above, you can see that your ``ExampleModule`` inherits :class:`CapBank <weboob.capabilities.bank.CapBank>`, as
 we have selected it for the supported website.
 
 Configuration
@@ -138,7 +138,7 @@ For example::
     from weboob.tools.backend import BackendConfig
 
     # ...
-    class ExampleBackend(BaseBackend, CapBank):
+    class ExampleModule(Module, CapBank):
         # ...
         CONFIG = BackendConfig(Value('username',                label='Username', regexp='.+'),
                                ValueBackendPassword('password', label='Password'),
@@ -155,7 +155,7 @@ Implement capabilities
 You need to implement each method of all of the capabilities your module implements. For example, in our case::
 
     # ...
-    class ExampleBackend(BaseBackend, CapBank):
+    class ExampleModule(Module, CapBank):
         # ...
 
         def iter_accounts(self):
@@ -170,7 +170,7 @@ You need to implement each method of all of the capabilities your module impleme
         def iter_coming(self, account):
             raise NotImplementedError()
 
-If you ran the ``boilerplate`` script command ``cap``, every methods are already in ``backend.py`` and documented.
+If you ran the ``boilerplate`` script command ``cap``, every methods are already in ``module.py`` and documented.
 
 Read :class:`documentation of the capability <weboob.capabilities.bank.CapBank>` to know what are types of arguments,
 what are expected returned objects, and what exceptions it may raises.
@@ -179,14 +179,14 @@ what are expected returned objects, and what exceptions it may raises.
 Browser
 *******
 
-Most of modules use a class derived from :class:`PagesBrowser <weboob.tools.browser2.page.PagesBrowser>` or
-:class:`LoginBrowser <weboob.tools.browser2.page.LoginBrowser>` (for authenticated websites) to interact with a website.
+Most of modules use a class derived from :class:`PagesBrowser <weboob.browser2.page.PagesBrowser>` or
+:class:`LoginBrowser <weboob.browser2.page.LoginBrowser>` (for authenticated websites) to interact with a website.
 
 Edit ``browser.py``::
 
     # -*- coding: utf-8 -*-
 
-    from weboob.tools.browser2 import PagesBrowser
+    from weboob.browser2 import PagesBrowser
 
     __all__ = ['ExampleBrowser']
 
@@ -195,7 +195,7 @@ Edit ``browser.py``::
 
 There are several possible class attributes:
 
-* **BASEURL** - base url of website used for absolute paths given to :class:`open() <weboob.tools.browser2.page.PagesBrowser.open>` or :class:`location() <weboob.tools.browser2.page.PagesBrowser.location>`
+* **BASEURL** - base url of website used for absolute paths given to :class:`open() <weboob.browser2.page.PagesBrowser.open>` or :class:`location() <weboob.browser2.page.PagesBrowser.location>`
 * **PROFILE** - defines the behavior of your browser against the website. By default this is Firefox, but you can import other profiles
 * **TIMEOUT** - defines the timeout for requests (defaults to 10 seconds)
 * **VERIFY** - SSL verification (if the protocol used is **https**)
@@ -205,15 +205,15 @@ Pages
 
 For each page you want to handle, you have to create an associated class derived from one of these classes:
 
-* :class:`HTMLPage <weboob.tools.browser2.page.HTMLPage>` - a HTML page
-* :class:`XMLPage <weboob.tools.browser2.page.XMLPage>` - a XML document
-* :class:`JsonPage <weboob.tools.browser2.page.JsonPage>` - a Json object
+* :class:`HTMLPage <weboob.browser2.page.HTMLPage>` - a HTML page
+* :class:`XMLPage <weboob.browser2.page.XMLPage>` - a XML document
+* :class:`JsonPage <weboob.browser2.page.JsonPage>` - a Json object
 
 In the file ``pages.py``, you can write, for example::
 
     # -*- coding: utf-8 -*-
 
-    from weboob.tools.browser2.page import HTMLPage
+    from weboob.browser2.page import HTMLPage
 
     __all__ = ['IndexPage', 'ListPage']
 
@@ -227,9 +227,9 @@ In the file ``pages.py``, you can write, for example::
 ``IndexPage`` is the class we will use to get information from the home page of the website, and ``ListPage`` will handle pages
 which list accounts.
 
-Then, you have to declare them in your browser, with the :class:`URL <weboob.tools.browser2.page.URL>` object::
+Then, you have to declare them in your browser, with the :class:`URL <weboob.browser2.page.URL>` object::
 
-    from weboob.tools.browser2.page import PagesBrowser, URL
+    from weboob.browser2.page import PagesBrowser, URL
     from .pages import IndexPage, ListPage
 
     # ...
@@ -255,23 +255,23 @@ For example, we can now implement some methods in ``ExampleBrowser``::
         def iter_accounts_list(self):
             self.accounts.stay_or_go()
 
-            return self.page.iter_accounts_list()
+            return self.page.iter_accounts()
 
-When calling the :func:`go() <weboob.tools.browser2.page.URL.go>` method, it reads the first regexp url of our :class:`URL <weboob.tools.browser2.page.URL>` object, and go on the page.
+When calling the :func:`go() <weboob.browser2.page.URL.go>` method, it reads the first regexp url of our :class:`URL <weboob.browser2.page.URL>` object, and go on the page.
 
-:func:`stay_or_go() <weboob.tools.browser2.page.URL.stay_or_go>` is used when you want to relocate on the page only if we aren't already on it.
+:func:`stay_or_go() <weboob.browser2.page.URL.stay_or_go>` is used when you want to relocate on the page only if we aren't already on it.
 
 Once we are on the ``ListPage``, we can call every methods of the ``page`` object.
 
 Use it in backend
 -----------------
 
-Now you have a functional browser, you can use it in your class ``ExampleBackend`` by defining it with the ``BROWSER`` attribute::
+Now you have a functional browser, you can use it in your class ``ExampleModule`` by defining it with the ``BROWSER`` attribute::
 
     from .browser import ExampleBrowser
 
     # ...
-    class ExampleBackend(BaseBackend, CapBank):
+    class ExampleModule(Module, CapBank):
         # ...
         BROWSER = ExampleBrowser
 
@@ -288,15 +288,15 @@ Login management
 ----------------
 
 When the website requires to be authenticated, you have to give credentials to the constructor of the browser. You can redefine
-the method :func:`create_default_browser <weboob.tools.backend.BaseBackend.create_default_browser>`::
+the method :func:`create_default_browser <weboob.tools.backend.Module.create_default_browser>`::
 
-    class ExampleBackend(BaseBackend, CapBank):
+    class ExampleModule(Module, CapBank):
         # ...
         def create_default_browser(self):
             return self.create_browser(self.config['username'].get(), self.config['password'].get())
 
-On the browser side, you need to inherit from :func:`LoginBrowser <weboob.tools.browser2.page.LoginBrowser>` and to implement the function
-:func:`do_login <weboob.tools.browser2.page.LoginBrowser.do_login>`::
+On the browser side, you need to inherit from :func:`LoginBrowser <weboob.browser2.page.LoginBrowser>` and to implement the function
+:func:`do_login <weboob.browser2.page.LoginBrowser.do_login>`::
 
     class ExampleBrowser(LoginBrowser):
         login = URL('/login', LoginPage)
@@ -319,7 +319,7 @@ Also, your ``LoginPage`` may look like::
             form['password'] = password
             form.submit()
 
-Then, each method on your browser which need your user to be authenticated may be decorated by :func:`need_login <weboob.tools.browser2.page.need_login>`::
+Then, each method on your browser which need your user to be authenticated may be decorated by :func:`need_login <weboob.browser2.page.need_login>`::
 
     class ExampleBrowser(LoginBrowser):
         accounts = URL('/accounts$', ListPage)
@@ -329,9 +329,9 @@ Then, each method on your browser which need your user to be authenticated may b
             self.accounts.stay_or_go()
             return self.page.get_accounts()
 
-The last thing to know is that :func:`need_login <weboob.tools.browser2.page.need_login>` checks if the current page is a logged one by
-reading the attribute :func:`logged <weboob.tools.browser2.page.BasePage.logged>` of the instance. You can either define it yourself, as a
-class boolean attribute or as a property, or to inherit your class from :class:`LoggedPage <weboob.tools.browser2.page.LoggedPage>`.
+The last thing to know is that :func:`need_login <weboob.browser2.page.need_login>` checks if the current page is a logged one by
+reading the attribute :func:`logged <weboob.browser2.page.Page.logged>` of the instance. You can either define it yourself, as a
+class boolean attribute or as a property, or to inherit your class from :class:`LoggedPage <weboob.browser2.page.LoggedPage>`.
 
 
 Parsing of pages
@@ -342,7 +342,7 @@ Parsing of pages
 
 
 When your browser locates on a page, an instance of the class related to the
-:class:`URL <weboob.tools.browser2.page.URL>` attribute which matches the url
+:class:`URL <weboob.browser2.page.URL>` attribute which matches the url
 is created. You can declare methods on your class to allow your browser to
 interact with it.
 
@@ -409,7 +409,7 @@ Edit ``test.py`` and write, for example::
     __all__ = ['ExampleTest']
 
     class ExampleTest(BackendTest):
-        BACKEND = 'example'
+        MODULE = 'example'
 
         def test_iter_accounts(self):
             accounts = list(self.backend.iter_accounts())
@@ -430,8 +430,8 @@ Filling objects
 
 An object returned by a method of a capability can be not fully completed.
 
-The class :class:`BaseBackend <weboob.tools.backend.BaseBackend>` provides a method named
-:func:`fillobj <weboob.tools.backend.BaseBackend.fillobj>`, which can be called by an application to
+The class :class:`Module <weboob.tools.backend.Module>` provides a method named
+:func:`fillobj <weboob.tools.backend.Module.fillobj>`, which can be called by an application to
 fill some unloaded fields of a specific object, for example with::
 
     backend.fillobj(video, ['url', 'author'])
@@ -441,9 +441,9 @@ not loaded (equal to ``NotLoaded``, which is the default value), to reduce the l
 uncompleted fields, and call the method associated to the type of the object.
 
 To define what objects are supported to be filled, and what method to call, define the ``OBJECTS``
-class attribute in your ``ExampleBackend``::
+class attribute in your ``ExampleModule``::
 
-    class ExampleBackend(BaseBackend, CapVideo):
+    class ExampleModule(Module, CapVideo):
         # ...
 
         OBJECTS = {Video: fill_video}
@@ -454,7 +454,7 @@ The prototype of the function might be::
 
 Then, the function might, for each requested fields, fetch the right data and fill the object. For example::
 
-    class ExampleBackend(BaseBackend, CapVideo):
+    class ExampleModule(Module, CapVideo):
         # ...
 
         def fill_video(self, video, fields):
@@ -477,7 +477,7 @@ The application can provide a storage to let your backend store data. So, you ca
 
     STORAGE = {'seen': {}}
 
-To store and read data in your storage space, use the ``storage`` attribute of your :class:`BaseBackend <weboob.tools.backend.BaseBackend>`
+To store and read data in your storage space, use the ``storage`` attribute of your :class:`Module <weboob.tools.backend.Module>`
 object.
 
 It implements the methods of :class:`BackendStorage <weboob.tools.backend.BackendStorage>`.

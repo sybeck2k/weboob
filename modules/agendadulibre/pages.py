@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from weboob.tools.browser2.page import HTMLPage, method, pagination
-from weboob.tools.browser2.elements import ItemElement, ListElement
-from weboob.tools.browser2.filters import Regexp, Link, CleanText, DateTime, Filter, Type, Env, XPath, Format, CleanHTML, CombineDate
+from weboob.browser2.page import HTMLPage, method, pagination
+from weboob.browser2.elements import ItemElement, ListElement
+from weboob.browser2.filters.standard import Regexp, CleanText, DateTime, Filter, Type, Env, Format, CombineDate
+from weboob.browser2.filters.html import Link, XPath, CleanHTML
 
 from .calendar import AgendaDuLibreCalendarEvent
 from datetime import time, datetime, date
@@ -59,7 +60,7 @@ class EventListPage(HTMLPage):
         def next_page(self):
             m = re.match('.*/events\?start_date=(\d{4})-(\d{2})-(\d{2})(&region=.*)?', self.page.url)
             if m:
-                start = date(year=int(m.group(1)), month=int(m.group(2)), day=int(m.group(3)))
+                start = date(year=int(m.group(1)), month=int(m.group(2)), day=1)
                 region = m.group(4) if m.group(4) else ''
                 try:
                     next_month = start.replace(month=start.month + 1)

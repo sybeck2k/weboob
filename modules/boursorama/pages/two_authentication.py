@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 
-from weboob.tools.browser import BasePage, BrowserIncorrectPassword
+from weboob.tools.browser import Page, BrowserIncorrectPassword
 import urllib2
 import re
 
@@ -27,7 +28,7 @@ class BrowserAuthenticationCodeMaxLimit(BrowserIncorrectPassword):
     pass
 
 
-class AuthenticationPage(BasePage):
+class AuthenticationPage(Page):
     MAX_LIMIT = "vous avez atteint le nombre maximum "\
         "d'utilisation de l'authentification forte."
 
@@ -121,4 +122,4 @@ class AuthenticationPage(BasePage):
 
     def print_cookies(self):
         for c in self.browser._ua_handlers["_cookies"].cookiejar:
-            print "%s : %s" % (c.name, c.value)
+            print("%s : %s" % (c.name, c.value))

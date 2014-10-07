@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from .backend import MareeinfoBackend
+from .module import MareeinfoModule
 
 
-__all__ = ['MareeinfoBackend']
+__all__ = ['MareeinfoModule']

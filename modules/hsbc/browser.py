@@ -22,8 +22,8 @@ import ssl
 from datetime import timedelta
 
 from weboob.tools.date import LinearDateGuesser
-from weboob.tools.exceptions import  BrowserIncorrectPassword
-from weboob.tools.browser2 import LoginBrowser, URL, need_login
+from weboob.core.exceptions import  BrowserIncorrectPassword
+from weboob.browser2 import LoginBrowser, URL, need_login
 from .pages import AccountsPage, CBOperationPage, CPTOperationPage, LoginPage
 
 
