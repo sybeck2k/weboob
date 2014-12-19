@@ -22,7 +22,8 @@ from weboob.tools.backend import Module
 from weboob.capabilities.paste import CapPaste, BasePaste
 from weboob.tools.capabilities.paste import image_mime
 from weboob.capabilities.base import StringField
-from weboob.tools.browser import StandardBrowser
+from weboob.deprecated.browser import StandardBrowser
+from weboob.deprecated.browser.decorators import check_url
 from urllib import urlencode
 import re
 
@@ -49,7 +50,7 @@ class ImgurModule(Module, CapPaste):
     MAINTAINER = u'Vincent A'
     EMAIL = 'dev@indigo.re'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
 
     CLIENT_ID = '87a8e692cb09382'
 
@@ -91,6 +92,7 @@ class ImgurModule(Module, CapPaste):
             paste.id = json['data']['id']
             paste.delete_url = 'https://api.imgur.com/3/image/%s' % json['data']['deletehash']
 
+    @check_url('https?://(?:[a-z]+\.)?imgur.com/')
     def get_paste(self, id):
         paste = ImgPaste(id)
         paste.contents = self.browser.readurl(paste.raw_url).encode('base64')

@@ -27,9 +27,9 @@ from weboob.capabilities import NotAvailable, NotLoaded
 from weboob.tools.misc import to_unicode
 from weboob.tools.log import getLogger
 
-from weboob.core.exceptions import ParseError
-from weboob.browser2.elements import TableElement, ItemElement
-from weboob.browser2.filters.standard import Filter, CleanText, CleanDecimal, TableCell
+from weboob.exceptions import ParseError
+from weboob.browser.elements import TableElement, ItemElement
+from weboob.browser.filters.standard import Filter, CleanText, CleanDecimal, TableCell
 
 
 __all__ = ['FrenchTransaction', 'AmericanTransaction']
@@ -38,6 +38,7 @@ __all__ = ['FrenchTransaction', 'AmericanTransaction']
 class classproperty(object):
     def __init__(self, f):
         self.f = f
+
     def __get__(self, obj, owner):
         return self.f(owner)
 
@@ -225,6 +226,7 @@ class FrenchTransaction(Transaction):
     @classmethod
     def Raw(klass, *args, **kwargs):
         patterns = klass.PATTERNS
+
         class Filter(CleanText):
             def __call__(self, item):
                 raw = super(Filter, self).__call__(item)
@@ -286,6 +288,7 @@ class FrenchTransaction(Transaction):
                         break
 
                 return raw
+
             def filter(self, text):
                 text = super(Filter, self).filter(text)
                 return to_unicode(text.replace(u'\n', u' ').strip())
@@ -332,6 +335,15 @@ class AmericanTransaction(Transaction):
             text = text.replace(',', ' ').replace('.', ',')
         return FrenchTransaction.clean_amount(text)
 
+    @classmethod
+    def decimal_amount(klass, text):
+        """
+        Convert a string containing an amount to Decimal.
+        """
+        amnt = AmericanTransaction.clean_amount(text)
+        return Decimal(amnt) if amnt else Decimal('0')
+
+
 def test():
     clean_amount = AmericanTransaction.clean_amount
     assert clean_amount('42') == '42'
@@ -340,3 +352,7 @@ def test():
     assert clean_amount('$42.12 USD') == '42.12'
     assert clean_amount('$12.442,12 USD') == '12442.12'
     assert clean_amount('$12,442.12 USD') == '12442.12'
+
+    decimal_amount = AmericanTransaction.decimal_amount
+    assert decimal_amount('$12,442.12 USD') == Decimal('12442.12')
+    assert decimal_amount('') == Decimal('0')

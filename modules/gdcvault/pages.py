@@ -19,7 +19,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 
 import urllib
 import re
@@ -28,7 +28,7 @@ from dateutil.parser import parse as parse_dt
 
 from weboob.capabilities.base import NotAvailable
 from weboob.capabilities.image import BaseImage
-from weboob.tools.browser import BrokenPageError
+from weboob.deprecated.browser import BrokenPageError
 
 #HACK
 from urllib2 import HTTPError
@@ -79,6 +79,8 @@ class IndexPage(Page):
 
 # the search page class uses a JSON parser,
 # since it's what search.php returns when POSTed (from Ajax)
+
+
 class SearchPage(Page):
     def iter_videos(self):
         if self.document is None or self.document['data'] is None:
@@ -89,6 +91,7 @@ class SearchPage(Page):
             if video is None:
                 continue
             yield video
+
 
 class VideoPage(Page):
     def get_video(self, video=None):

@@ -75,8 +75,8 @@ class JobAdvertListFormatter(PrettyFormatter):
 
 class Handjoob(ReplApplication):
     APPNAME = 'handjoob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2012 Bezleputh'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2012-YEAR Bezleputh'
     DESCRIPTION = "Console application to search for a job."
     SHORT_DESCRIPTION = "search for a job"
     CAPS = CapJob
@@ -97,7 +97,7 @@ class Handjoob(ReplApplication):
         """
         self.change_path([u'search'])
         self.start_format(pattern=pattern)
-        for backend, job_advert in self.do('search_job', pattern):
+        for job_advert in self.do('search_job', pattern):
             self.cached_format(job_advert)
 
     @defaultcount(10)
@@ -108,7 +108,7 @@ class Handjoob(ReplApplication):
         Search for an advert matching to advanced filters.
         """
         self.change_path([u'advanced'])
-        for backend, job_advert in self.do('advanced_search_job'):
+        for job_advert in self.do('advanced_search_job'):
             self.cached_format(job_advert)
 
     def complete_info(self, text, line, *ignored):

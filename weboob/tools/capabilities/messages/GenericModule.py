@@ -31,7 +31,7 @@ class GenericNewspaperModule(Module, CapMessages):
     """
     MAINTAINER = u'Julien Hebert'
     EMAIL = 'juke@free.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     STORAGE = {'seen': {}}
     RSS_FEED = None
@@ -57,7 +57,7 @@ class GenericNewspaperModule(Module, CapMessages):
             thread = Thread(id)
 
         flags = Message.IS_HTML
-        if not thread.id in self.storage.get('seen', default={}):
+        if thread.id not in self.storage.get('seen', default={}):
             flags |= Message.IS_UNREAD
         thread.title = content.title
         if not thread.date:

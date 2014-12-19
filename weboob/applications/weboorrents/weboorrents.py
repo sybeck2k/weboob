@@ -90,8 +90,8 @@ class TorrentListFormatter(PrettyFormatter):
 
 class Weboorrents(ReplApplication):
     APPNAME = 'weboorrents'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2010-2012 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2010-YEAR Romain Bignon'
     DESCRIPTION = "Console application allowing to search for torrents on various trackers " \
                   "and download .torrent files."
     SHORT_DESCRIPTION = "search and download torrents"
@@ -147,7 +147,7 @@ class Weboorrents(ReplApplication):
         dest = self.obj_to_filename(torrent, dest, '{id}-{name}.torrent')
 
         try:
-            for backend, buf in self.do('get_torrent_file', torrent.id, backends=torrent.backend):
+            for buf in self.do('get_torrent_file', torrent.id, backends=torrent.backend):
                 if buf:
                     if dest == '-':
                         print(buf)
@@ -162,9 +162,9 @@ class Weboorrents(ReplApplication):
         except CallErrors as errors:
             for backend, error, backtrace in errors:
                 if isinstance(error, MagnetOnly):
-                    print(u'Error(%s): No direct URL available, ' \
-                        u'please provide this magnet URL ' \
-                        u'to your client:\n%s' % (backend, error.magnet), file=self.stderr)
+                    print(u'Error(%s): No direct URL available, '
+                          u'please provide this magnet URL '
+                          u'to your client:\n%s' % (backend, error.magnet), file=self.stderr)
                     return 4
                 else:
                     self.bcall_error_handler(backend, error, backtrace)
@@ -184,5 +184,5 @@ class Weboorrents(ReplApplication):
             pattern = None
 
         self.start_format(pattern=pattern)
-        for backend, torrent in self.do('iter_torrents', pattern=pattern):
+        for torrent in self.do('iter_torrents', pattern=pattern):
             self.cached_format(torrent)

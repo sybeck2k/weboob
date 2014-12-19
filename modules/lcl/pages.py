@@ -26,7 +26,7 @@ import random
 
 
 from weboob.capabilities.bank import Account
-from weboob.tools.browser import Page, BrowserUnavailable
+from weboob.deprecated.browser import Page, BrowserUnavailable
 from weboob.tools.captcha.virtkeyboard import MappedVirtKeyboard, VirtKeyboardError
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
 
@@ -131,6 +131,7 @@ class LoginPage(Page):
     def is_error(self):
         errors = self.document.xpath(u'//div[@class="erreur" or @class="messError"]')
         return len(errors) > 0
+
 
 class ContractsPage(Page):
     def on_loaded(self):

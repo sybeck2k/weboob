@@ -20,9 +20,9 @@
 
 from datetime import datetime, date, time
 
-from weboob.tools.browser import Browser
+from weboob.deprecated.browser import Browser
 from weboob.tools.misc import to_unicode
-from weboob.tools.browser import BrokenPageError
+from weboob.deprecated.browser import BrokenPageError
 
 
 __all__ = ['CanalTP']
@@ -51,7 +51,7 @@ class CanalTP(Browser):
         result = result
         departure = ''
         for line in result.split('&'):
-            if not '=' in line:
+            if '=' not in line:
                 raise BrokenPageError('Unable to parse result: %s' % line)
             key, value = line.split('=', 1)
             if key == 'nomgare':

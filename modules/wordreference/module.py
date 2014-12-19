@@ -19,7 +19,7 @@
 "backend for http://www.wordreference.com"
 
 
-from weboob.capabilities.translate import CapTranslate, Translation, TranslationFail, LanguageNotSupported
+from weboob.capabilities.translate import CapTranslate, TranslationFail, LanguageNotSupported
 from weboob.tools.backend import Module
 
 from .browser import WordReferenceBrowser
@@ -31,30 +31,30 @@ __all__ = ['WordReferenceModule']
 class WordReferenceModule(Module, CapTranslate):
     MAINTAINER = u'Lucien Loiseau'
     EMAIL = 'loiseau.lucien@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     NAME = 'wordreference'
     DESCRIPTION = u'Free online translator'
     BROWSER = WordReferenceBrowser
     WRLANGUAGE = {
-        'Arabic':'ar', 'Chinese':'zh', 'Czech':'cz', 'English':'en', 'French':'fr', 'Greek':'gr',
-        'Italian':'it', 'Japanese':'ja', 'Korean':'ko', 'Polish':'pl', 'Portuguese':'pt',
-        'Romanian':'ro', 'Spanish':'es', 'Turkish':'tr',
+        'Arabic': 'ar', 'Chinese': 'zh', 'Czech': 'cz', 'English': 'en', 'French': 'fr', 'Greek': 'gr',
+        'Italian': 'it', 'Japanese': 'ja', 'Korean': 'ko', 'Polish': 'pl', 'Portuguese': 'pt',
+        'Romanian': 'ro', 'Spanish': 'es', 'Turkish': 'tr',
         }
 
     def translate(self, lan_from, lan_to, text):
-        if not lan_from in self.WRLANGUAGE.keys():
+        if lan_from not in self.WRLANGUAGE.keys():
             raise LanguageNotSupported()
 
-        if not lan_to in self.WRLANGUAGE.keys():
+        if lan_to not in self.WRLANGUAGE.keys():
             raise LanguageNotSupported()
 
-        translation = Translation(0)
-        translation.lang_src = unicode(self.WRLANGUAGE[lan_from])
-        translation.lang_dst = unicode(self.WRLANGUAGE[lan_to])
-        translation.text = self.browser.translate(self.WRLANGUAGE[lan_from], self.WRLANGUAGE[lan_to], text)
+        translations = self.browser.translate(self.WRLANGUAGE[lan_from], self.WRLANGUAGE[lan_to], text)
+        has_translation = False
 
-        if translation.text is None:
+        for translation in translations:
+            has_translation = True
+            yield translation
+
+        if not has_translation:
             raise TranslationFail()
-
-        return translation

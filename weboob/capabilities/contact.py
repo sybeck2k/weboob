@@ -101,7 +101,7 @@ class Contact(BaseObject):
         :type name: str
         :param kwargs: See :class:`ContactPhoto` to know what other parameters you can use
         """
-        if not name in self.photos:
+        if name not in self.photos:
             self.photos[name] = ContactPhoto(name)
 
         photo = self.photos[name]
@@ -216,7 +216,7 @@ class CapContact(Capability):
         :type id: str
         :rtype: unicode
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def save_notes(self, id, notes):
         """
@@ -226,4 +226,4 @@ class CapContact(Capability):
         :type id: str
         :returns: the unicode object to save as notes
         """
-        raise NotImplementedError
+        raise NotImplementedError()

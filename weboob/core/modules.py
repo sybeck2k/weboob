@@ -103,6 +103,7 @@ class ModulesLoader(object):
     """
     Load modules.
     """
+
     def __init__(self, path, version=None):
         self.version = version
         self.path = path
@@ -148,7 +149,7 @@ class ModulesLoader(object):
                 if fp:
                     fp.close()
         except Exception as e:
-            if logging.root.level == logging.DEBUG:
+            if logging.root.level <= logging.DEBUG:
                 self.logger.exception(e)
             raise ModuleLoadError(module_name, e)
 
@@ -162,10 +163,12 @@ class ModulesLoader(object):
     def get_module_path(self, module_name):
         return self.path
 
+
 class RepositoryModulesLoader(ModulesLoader):
     """
     Load modules from repositories.
     """
+
     def __init__(self, repositories):
         super(RepositoryModulesLoader, self).__init__(repositories.modules_dir, repositories.version)
         self.repositories = repositories

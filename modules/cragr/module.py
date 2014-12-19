@@ -34,7 +34,7 @@ class CragrModule(Module, CapBank):
     NAME = 'cragr'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Crédit Agricole'
     LICENSE = 'AGPLv3+'
     website_choices = OrderedDict([(k, u'%s (%s)' % (v, k)) for k, v in sorted({
@@ -80,7 +80,7 @@ class CragrModule(Module, CapBank):
         }.iteritems())])
     CONFIG = BackendConfig(Value('website',  label=u'Région', choices=website_choices),
                            ValueBackendPassword('login',    label=u'N° de compte', masked=False),
-                           ValueBackendPassword('password', label=u'Code personnel'))
+                           ValueBackendPassword('password', label=u'Code personnel', regexp=r'\d{6}'))
     BROWSER = Cragr
 
     def create_default_browser(self):

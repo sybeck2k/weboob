@@ -23,7 +23,7 @@ from weboob.tools.backend import Module, BackendConfig
 from weboob.capabilities.messages import CapMessages, Thread, CapMessagesPost
 from weboob.capabilities.collection import CapCollection, CollectionNotFound, Collection
 from weboob.capabilities.base import find_object
-from weboob.core.exceptions import BrowserForbidden
+from weboob.exceptions import BrowserForbidden
 from .browser import TwitterBrowser
 import itertools
 
@@ -36,7 +36,7 @@ class TwitterModule(Module, CapMessages, CapMessagesPost, CapCollection):
     MAINTAINER = u'Bezleputh'
     EMAIL = 'carton_ben@yahoo.fr'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
     BROWSER = TwitterBrowser
     STORAGE = {'seen': {}}
 

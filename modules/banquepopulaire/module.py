@@ -33,7 +33,7 @@ class BanquePopulaireModule(Module, CapBank):
     NAME = 'banquepopulaire'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Banque Populaire'
     LICENSE = 'AGPLv3+'
     website_choices = OrderedDict([(k, u'%s (%s)' % (v, k)) for k, v in sorted({
@@ -56,7 +56,7 @@ class BanquePopulaireModule(Module, CapBank):
         'www.ibps.rivesparis.banquepopulaire.fr': u'Rives de Paris',
         'www.ibps.sud.banquepopulaire.fr': u'Sud',
         'www.ibps.valdefrance.banquepopulaire.fr': u'Val de France',
-        }.iteritems(), key=lambda (k, v): (v, k))])
+        }.iteritems(), key=lambda k_v: (k_v[1], k_v[0]))])
     CONFIG = BackendConfig(Value('website',  label=u'Région', choices=website_choices),
                            ValueBackendPassword('login',    label='Identifiant', masked=False),
                            ValueBackendPassword('password', label='Mot de passee'))

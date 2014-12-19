@@ -19,8 +19,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.video import CapVideo
 from weboob.tools.backend import Module
 
@@ -35,7 +33,7 @@ class TricTracTVModule(Module, CapVideo):
     NAME = 'trictractv'
     MAINTAINER = u'Benjamin Drieu'
     EMAIL = 'benjamin@drieu.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'TricTrac.tv video website'
     LICENSE = 'AGPLv3+'
     BROWSER = TricTracTVBrowser

@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 from weboob.tools.backend import Module, BackendConfig
-from weboob.tools.browser import BrowserForbidden
+from weboob.deprecated.browser import BrowserForbidden
 from weboob.tools.value import Value, ValueBackendPassword
 from weboob.capabilities.messages import CapMessages, CapMessagesPost, Message
 from weboob.capabilities.contact import CapContact
@@ -65,7 +65,7 @@ class OvsModule(Module, CapMessages, CapMessagesPost, CapContact):
     DESCRIPTION = u'OnVaSortir website. Handles private messages only'
     MAINTAINER = u'Vincent A'
     EMAIL = 'dev@indigo.re'
-    VERSION = '1.0'
+    VERSION = '1.1'
 
     CONFIG = BackendConfig(Value('username',                label='Username', default=''),
                            ValueBackendPassword('password', label='Password', default=''),

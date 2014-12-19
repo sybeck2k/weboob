@@ -40,8 +40,8 @@ class RentedListFormatter(PrettyFormatter):
 
 class Boobooks(ReplApplication):
     APPNAME = 'boobooks'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2012 Jeremy Monnet'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2012-YEAR Jeremy Monnet'
     CAPS = CapBook
     DESCRIPTION = "Console application allowing to list your books rented or booked at the library, " \
                   "book and search new ones, get your booking history (if available)."
@@ -68,5 +68,5 @@ class Boobooks(ReplApplication):
             return 2
         names = (backend_name,) if backend_name is not None else None
 
-        for backend, renew in self.do('renew_book', id, backends=names):
+        for renew in self.do('renew_book', id, backends=names):
             self.format(renew)

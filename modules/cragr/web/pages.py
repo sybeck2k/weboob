@@ -17,14 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-
 import re
 from decimal import Decimal
 
 from weboob.tools.date import parse_french_date
 from weboob.capabilities.bank import Account
-from weboob.tools.browser import Page, BrokenPageError
+from weboob.deprecated.browser import Page, BrokenPageError
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction as Transaction
 
 
@@ -41,11 +39,9 @@ class HomePage(Page):
 
         return None
 
+
 class LoginPage(Page):
     def login(self, password):
-        assert password.isdigit()
-        assert len(password) == 6
-
         imgmap = {}
         for td in self.document.xpath('//table[@id="pave-saisie-code"]/tr/td'):
             a = td.find('a')
@@ -62,11 +58,14 @@ class LoginPage(Page):
     def get_result_url(self):
         return self.parser.tocleanstring(self.document.getroot())
 
+
 class UselessPage(Page):
     pass
 
+
 class LoginErrorPage(Page):
     pass
+
 
 class _AccountsPage(Page):
     COL_LABEL    = 0
@@ -219,17 +218,20 @@ class CardsPage(Page):
             try:
                 t.id = t.unique_id(seen)
             except UnicodeEncodeError:
-                print(t)
-                print(t.label)
+                self.logger.debug(t)
+                self.logger.debug(t.label)
                 raise
 
             yield t
 
+
 class AccountsPage(_AccountsPage):
     pass
 
+
 class SavingsPage(_AccountsPage):
     COL_ID       = 1
+
 
 class TransactionsPage(Page):
     def get_next_url(self):
@@ -300,8 +302,12 @@ class TransactionsPage(Page):
 
             t = Transaction(i)
 
+            col_text = cols[self.COL_TEXT]
+            if len(col_text.xpath('.//br')) == 0:
+                col_text = cols[self.COL_TEXT+1]
+
+            raw = self.parser.tocleanstring(col_text)
             date = self.parser.tocleanstring(cols[self.COL_DATE])
-            raw = self.parser.tocleanstring(cols[self.COL_TEXT])
             credit = self.parser.tocleanstring(cols[self.COL_CREDIT])
             if self.COL_DEBIT is not None:
                 debit =  self.parser.tocleanstring(cols[self.COL_DEBIT])
@@ -314,7 +320,6 @@ class TransactionsPage(Page):
             t.raw = raw
 
             # On some accounts' history page, there is a <font> tag in columns.
-            col_text = cols[self.COL_TEXT]
             if col_text.find('font') is not None:
                 col_text = col_text.find('font')
 

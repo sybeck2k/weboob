@@ -19,7 +19,7 @@
 
 import urllib
 
-from weboob.tools.browser import Browser, Page
+from weboob.deprecated.browser import Browser, Page
 from weboob.tools.ordereddict import OrderedDict
 
 from .pages import LoginPage, ThreadPage, MessagesPage, PostMessagePage, ProfilePage, PhotosPage, VisitsPage, QuickMatchPage, SentPage
@@ -110,7 +110,7 @@ class OkCBrowser(Browser):
     #    return r['result']['flashs']
 
     #@check_login
-    #def nb_godchilds(self):
+    #def nb_godchildren(self):
     #    r = self.api_request('member', 'view', data={'id': self.my_id})
     #    return int(r['result']['member']['popu']['invits'])
 
@@ -126,8 +126,8 @@ class OkCBrowser(Browser):
 
     @check_login
     def get_visits(self):
-       self.location('http://m.okcupid.com/visitors')
-       return self.page.get_visits()
+        self.location('http://m.okcupid.com/visitors')
+        return self.page.get_visits()
 
     @check_login
     def get_threads_list(self):
@@ -266,5 +266,3 @@ class OkCBrowser(Browser):
         self.addheaders = [('Referer', self.page.url), ('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')]
         self.open('http://m.okcupid.com%s' %abs_url, data=data)
         return True
-
-

@@ -27,8 +27,8 @@ __all__ = ['WeboobCli']
 
 class WeboobCli(ReplApplication):
     APPNAME = 'weboob-cli'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2010-2011 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2010-YEAR Romain Bignon'
     SYNOPSIS =  'Usage: %prog [-dqv] [-b backends] [-cnfs] capability method [arguments..]\n'
     SYNOPSIS += '       %prog [--help] [--version]'
     DESCRIPTION = "Weboob-Cli is a console application to call a specific method on backends " \
@@ -50,7 +50,7 @@ class WeboobCli(ReplApplication):
 
         self.load_backends(cap_s)
 
-        for backend, obj in self.do(cmd, *args):
+        for obj in self.do(cmd, *args):
             self.format(obj)
 
         self.flush()

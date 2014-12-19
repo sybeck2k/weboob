@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.bank import CapBank, AccountNotFound
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword, Value
@@ -33,14 +32,14 @@ class BredModule(Module, CapBank):
     NAME = 'bred'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Bred'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(ValueBackendPassword('login',    label='Identifiant', masked=False),
                            ValueBackendPassword('password', label='Mot de passe'),
                            Value('website', label=u"Site d'accès", default='bred',
                                  choices={'bred': 'BRED', 'dispobank': 'DispoBank'}),
-                           Value('accnum', label=u'Account number to force (optional)', default='', masked=False)
+                           Value('accnum', label=u'Numéro du compte bancaire (optionnel)', default='', masked=False)
                           )
     BROWSER = BredBrowser
 

@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.bill import CapBill, Subscription, SubscriptionNotFound, Detail
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword
@@ -33,7 +32,7 @@ class NettoKomModule(Module, CapBill):
     NAME = 'nettokom'
     MAINTAINER = u'Florent Fourcot'
     EMAIL = 'weboob@flo.fourcot.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = 'Nettokom website'
     CONFIG = BackendConfig(ValueBackendPassword('login',

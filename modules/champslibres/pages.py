@@ -19,8 +19,8 @@
 
 from datetime import date
 from weboob.capabilities.library import Book, Renew
-from weboob.tools.browser import Page
-from weboob.tools.mech import ClientForm
+from weboob.deprecated.browser import Page
+from weboob.deprecated.mech import ClientForm
 from weboob.tools.html import html2text
 
 
@@ -55,7 +55,7 @@ class RentedPage(Page):
             yield book
 
     def renew(self, id):
-        # find the good box
+        # find the good box
         input = self.document.find('//input[@value="%s"]' % id)
         self.browser.select_form("checkout_form")
         self.browser.form.set_all_readonly(False)

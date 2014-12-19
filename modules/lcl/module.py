@@ -18,8 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.bank import CapBank, AccountNotFound
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword, Value
@@ -35,7 +33,7 @@ class LCLModule(Module, CapBank):
     NAME = 'lcl'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'LCL'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(ValueBackendPassword('login',    label='Identifiant', masked=False),
@@ -87,7 +85,7 @@ class LCLModule(Module, CapBank):
 
     def iter_coming(self, account):
         if self.BROWSER != LCLBrowser:
-            raise NotImplementedError
+            raise NotImplementedError()
 
         with self.browser:
             transactions = list(self.browser.get_cb_operations(account))

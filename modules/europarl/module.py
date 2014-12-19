@@ -19,8 +19,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.video import CapVideo, BaseVideo
 from weboob.tools.backend import Module
 from weboob.capabilities.collection import CapCollection, CollectionNotFound
@@ -36,7 +34,7 @@ class EuroparlModule(Module, CapVideo, CapCollection):
     NAME = 'europarl'
     MAINTAINER = u'François Revol'
     EMAIL = 'revol@free.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'Europarl parliamentary video streaming website'
     LICENSE = 'AGPLv3+'
     BROWSER = EuroparlBrowser

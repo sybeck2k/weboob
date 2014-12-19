@@ -22,7 +22,7 @@ import datetime
 from decimal import Decimal
 import re
 
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 from weboob.capabilities.bank import Account
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
 
@@ -104,7 +104,7 @@ class AccountsPage(Page):
                 text = script.text
                 if text is None:
                     continue
-                if not 'remotePerso' in text:
+                if 'remotePerso' not in text:
                     continue
 
                 account = None

@@ -34,6 +34,10 @@ class HousingFormatter(IFormatter):
     def format_obj(self, obj, alias):
         result = u'%s%s%s\n' % (self.BOLD, obj.title, self.NC)
         result += 'ID: %s\n' % obj.fullid
+
+        if hasattr(obj, 'url') and obj.url:
+            result += 'URL: %s\n' % obj.url
+
         result += 'Cost: %s%s\n' % (obj.cost, obj.currency)
         result += u'Area: %sm²\n' % (obj.area)
         if obj.date:
@@ -56,6 +60,7 @@ class HousingFormatter(IFormatter):
             result += '\n\n%sDetails%s\n' % (self.BOLD, self.NC)
             for key, value in obj.details.iteritems():
                 result += ' %s: %s\n' % (key, value)
+
         return result
 
 
@@ -75,8 +80,8 @@ class HousingListFormatter(PrettyFormatter):
 
 class Flatboob(ReplApplication):
     APPNAME = 'flatboob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2012 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2012-YEAR Romain Bignon'
     DESCRIPTION = "Console application to search for housing."
     SHORT_DESCRIPTION = "search for housing"
     CAPS = CapHousing
@@ -111,7 +116,7 @@ class Flatboob(ReplApplication):
                 break
 
             cities = []
-            for backend, city in self.weboob.do('search_city', pattern):
+            for city in self.weboob.do('search_city', pattern):
                 cities.append(city)
 
             if len(cities) == 0:
@@ -127,7 +132,7 @@ class Flatboob(ReplApplication):
             r = 'notempty'
             while r != '':
                 for i, city in enumerate(cities):
-                    print('  %s%2d)%s [%s] %s' % (self.BOLD, i+1, self.NC, 'x' if city in query.cities else ' ', city.name))
+                    print('  %s%2d)%s [%s] %s (%s)' % (self.BOLD, i+1, self.NC, 'x' if city in query.cities else ' ', city.name, city.backend))
                 r = self.ask('  Select cities (or empty to stop)', regexp='(\d+|)', default='')
                 if not r.isdigit():
                     continue
@@ -190,7 +195,7 @@ class Flatboob(ReplApplication):
     def complete_search(self, query):
         self.change_path([u'housings'])
         self.start_format()
-        for backend, housing in self.do('search_housings', query):
+        for housing in self.do('search_housings', query):
             self.cached_format(housing)
 
     def ask_int(self, txt):

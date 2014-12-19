@@ -45,16 +45,17 @@ class DeparturesFormatter(PrettyFormatter):
 
     def get_description(self, obj):
         if hasattr(obj, 'arrival_time') and not empty(obj.arrival_time):
-            s = '(%s)  %s%s\n\t(%s)  %s' % (self.colored(obj.time.strftime('%H:%M'), 'cyan'),
+            s = '(%s)  %s%s\n\t(%s)  %s' % (self.colored(obj.time.strftime('%H:%M') if obj.time else '??:??', 'cyan'),
                                             obj.departure_station,
                                             self.colored(' [Platform: %s]' % obj.platform, 'yellow') if (hasattr(obj, 'platform') and not empty(obj.platform)) else '',
                                             self.colored(obj.arrival_time.strftime('%H:%M'), 'cyan'),
                                             obj.arrival_station)
         else:
-            s = '(%s)  %20s -> %s' % (self.colored(obj.time.strftime('%H:%M'), 'cyan'),
+            s = '(%s)  %20s -> %s' % (self.colored(obj.time.strftime('%H:%M') if obj.time else '??:??', 'cyan'),
                                       obj.departure_station, obj.arrival_station)
 
         return s
+
 
 class StationsFormatter(PrettyFormatter):
     MANDATORY_FIELDS = ('id', 'name')
@@ -62,10 +63,11 @@ class StationsFormatter(PrettyFormatter):
     def get_title(self, obj):
         return obj.name
 
+
 class Traveloob(ReplApplication):
     APPNAME = 'traveloob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2010-2013 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2010-YEAR Romain Bignon'
     DESCRIPTION = "Console application allowing to search for train stations and get departure times."
     SHORT_DESCRIPTION = "search for train stations and departures"
     CAPS = CapTravel
@@ -88,7 +90,7 @@ class Traveloob(ReplApplication):
 
         Search stations.
         """
-        for backend, station in self.do('iter_station_search', pattern):
+        for station in self.do('iter_station_search', pattern):
             self.format(station)
 
     @defaultcount(10)
@@ -125,7 +127,7 @@ class Traveloob(ReplApplication):
                 print('Please enter a datetime in form "yyyy-mm-dd HH:MM" or "HH:MM".', file=self.stderr)
                 return 1
 
-        for backend, departure in self.do('iter_station_departures', station_id, arrival_id, date, backends=backends):
+        for departure in self.do('iter_station_departures', station_id, arrival_id, date, backends=backends):
             self.format(departure)
 
     def do_roadmap(self, line):
@@ -154,7 +156,7 @@ class Traveloob(ReplApplication):
             print('Please enter a datetime in form "yyyy-mm-dd HH:MM" or "HH:MM".', file=self.stderr)
             return 1
 
-        for backend, route in self.do('iter_roadmap', departure, arrival, filters):
+        for route in self.do('iter_roadmap', departure, arrival, filters):
             self.format(route)
 
     def parse_datetime(self, text):

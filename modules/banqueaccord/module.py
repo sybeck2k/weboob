@@ -35,7 +35,7 @@ class BanqueAccordModule(Module, CapBank):
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
     CONFIG = BackendConfig(ValueBackendPassword('login',    label='Identifiant', regexp='\d+', masked=False),
                            ValueBackendPassword('password', label=u"Code d'accès", regexp='\d+'))
 
@@ -46,7 +46,7 @@ class BanqueAccordModule(Module, CapBank):
                                    self.config['password'].get())
 
     def iter_accounts(self):
-         return self.browser.get_accounts_list()
+        return self.browser.get_accounts_list()
 
     def get_account(self, _id):
         return find_object(self.browser.get_accounts_list(), id=_id, error=AccountNotFound)

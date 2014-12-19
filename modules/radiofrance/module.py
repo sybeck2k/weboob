@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.base import NotLoaded
 from weboob.capabilities.video import CapVideo
 from weboob.capabilities.radio import CapRadio, Radio
@@ -37,7 +36,7 @@ class RadioFranceModule(Module, CapRadio, CapCollection, CapVideo):
     NAME = 'radiofrance'
     MAINTAINER = u'Laurent Bachelier'
     EMAIL = 'laurent@bachelier.name'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Radios of Radio France: Inter, Info, Bleu, Culture, Musique, FIP, Le Mouv\''
     LICENSE = 'AGPLv3+'
     BROWSER = RadioFranceBrowser

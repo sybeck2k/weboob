@@ -33,8 +33,8 @@ __all__ = ['Pastoob']
 
 class Pastoob(ReplApplication):
     APPNAME = 'pastoob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2011-2013 Laurent Bachelier'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2011-YEAR Laurent Bachelier'
     DESCRIPTION = "Console application allowing to post and get pastes from pastebins."
     SHORT_DESCRIPTION = "post and get pastes from pastebins"
     CAPS = CapPaste
@@ -105,7 +105,7 @@ class Pastoob(ReplApplication):
             output.write(paste.contents)
             # add a newline unless we are writing
             # in a file or in a pipe
-            if os.isatty(output.fileno()):
+            if output.isatty():
                 output.write('\n')
 
     def do_post(self, line):

@@ -18,10 +18,9 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.geolocip import CapGeolocIp, IpLocation
 from weboob.tools.backend import Module
-from weboob.tools.browser import StandardBrowser
+from weboob.deprecated.browser import StandardBrowser
 
 
 __all__ = ['IpinfodbModule']
@@ -31,7 +30,7 @@ class IpinfodbModule(Module, CapGeolocIp):
     NAME = 'ipinfodb'
     MAINTAINER = u'Julien Veyssier'
     EMAIL = 'julien.veyssier@aiur.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u"IPInfoDB IP addresses geolocation service"
     BROWSER = StandardBrowser

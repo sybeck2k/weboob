@@ -21,7 +21,7 @@
 from weboob.capabilities.collection import Collection
 from weboob.capabilities.image import BaseImage
 
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 
 import re
 from datetime import datetime, timedelta
@@ -67,9 +67,10 @@ class VideoPage(Page):
                                                    seconds=int(m.group(3)))
             return video
 
+
 class VideoListPage(Page):
     def is_list_empty(self):
-        return self.document.getroot() == None
+        return self.document.getroot() is None
 
     def iter_video(self, available_videos):
         for el in self.document.getroot().xpath('//li/a'):
@@ -85,12 +86,13 @@ class VideoListPage(Page):
                         video.title = video.title + ' - ' + strongs[3].text
                     yield video
 
+
 class FamilyPage(Page):
     def iter_category(self):
         subs = list()
 
         for el in self.document.xpath('//ul/li[@data-role="list-divider"]'):
-            if not el.text in subs:
+            if el.text not in subs:
                 yield Collection([el.text], unicode(el.text))
             subs.append(el.text)
 
@@ -101,13 +103,14 @@ class FamilyPage(Page):
 
             while True:
                 el = el.getnext()
-                if el == None or el.get('data-role'):
+                if el is None or el.get('data-role'):
                     break
                 h1 = el.find('.//h1')
                 id = h1.getparent().attrib['href']
                 m = re.search(r'famille-(\d+)', id)
                 if m and m.group(1):
                     yield Collection([m.group(1)], unicode(h1.text))
+
 
 class AboPage(Page):
     def get_available_videos(self):
@@ -129,6 +132,7 @@ class LoginPage(Page):
         self.browser['username'] = str(username)
         self.browser['password'] = str(password)
         self.browser.submit()
+
 
 class HomePage(Page):
     def is_logged(self):

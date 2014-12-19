@@ -27,7 +27,7 @@ except ImportError:
     raise ImportError('Please install python-dateutil')
 
 
-__all__ = ['local2utc', 'utc2local', 'LinearDateGuesser', 'date', 'datetime', 'new_date', 'new_datetime']
+__all__ = ['local2utc', 'utc2local', 'LinearDateGuesser', 'date', 'datetime', 'new_date', 'new_datetime', 'closest_date']
 
 
 def local2utc(dateobj):
@@ -214,6 +214,7 @@ class ChaoticDateGuesser(LinearDateGuesser):
     This class aim to find the guess the date when you know the
     day and month and the minimum year
     """
+
     def __init__(self, min_date, current_date=None, date_max_bump=timedelta(7)):
         if min_date is None:
             raise ValueError("min_date is not set")
@@ -242,15 +243,23 @@ DATE_TRANSLATE_FR = [(re.compile(ur'janvier', re.I),   ur'january'),
                      (re.compile(ur'novembre', re.I),  ur'november'),
                      (re.compile(ur'décembre', re.I),  ur'december'),
                      (re.compile(ur'jan\.', re.I),   ur'january'),
+                     (re.compile(ur'\bjan\b', re.I),   ur'january'),
                      (re.compile(ur'fév\.', re.I),   ur'february'),
+                     (re.compile(ur'\bfév\b', re.I),   ur'february'),
                      (re.compile(ur'avr\.', re.I),     ur'april'),
+                     (re.compile(ur'\bavr\b', re.I),     ur'april'),
                      (re.compile(ur'juil\.', re.I),   ur'july'),
                      (re.compile(ur'juill\.', re.I),   ur'july'),
+                     (re.compile(ur'\bjuil\b', re.I),   ur'july'),
                      (re.compile(ur'sep\.', re.I), ur'september'),
                      (re.compile(ur'sept\.', re.I), ur'september'),
+                     (re.compile(ur'\bsep\b', re.I), ur'september'),
                      (re.compile(ur'oct\.', re.I),   ur'october'),
+                     (re.compile(ur'\boct\b', re.I),   ur'october'),
                      (re.compile(ur'nov\.', re.I),  ur'november'),
+                     (re.compile(ur'\bnov\b', re.I),  ur'november'),
                      (re.compile(ur'déc\.', re.I),  ur'december'),
+                     (re.compile(ur'\bdéc\b', re.I),  ur'december'),
                      (re.compile(ur'lundi', re.I),     ur'monday'),
                      (re.compile(ur'mardi', re.I),     ur'tuesday'),
                      (re.compile(ur'mercredi', re.I),  ur'wednesday'),
@@ -314,3 +323,47 @@ def parse_date(string):
 
     elif string.upper() == "TODAY":
         return date.today()
+
+
+def closest_date(date, date_from, date_to):
+    """
+    Adjusts year so that the date is closest to the given range.
+    Transactions dates in a statement usually contain only day and month.
+    Statement dates range have a year though.
+    Merge them all together to get a full transaction date.
+    """
+    # If the date is within given range, we're done.
+    if date_from <= date <= date_to:
+        return date
+
+    dates = [real_datetime(year, date.month, date.day)
+             for year in xrange(date_from.year, date_to.year+1)]
+
+    # Ideally, pick the date within given range.
+    for d in dates:
+        if date_from <= d <= date_to:
+            return d
+
+    # Otherwise, return the most recent date in the past.
+    return min(dates, key=lambda d: abs(d-date_from))
+
+
+def test():
+    dt = real_datetime
+    range1 = [dt(2012,12,20), dt(2013,1,10)]
+
+    assert closest_date(dt(2012,12,15), *range1) == dt(2012,12,15)
+    assert closest_date(dt(2000,12,15), *range1) == dt(2012,12,15)
+    assert closest_date(dt(2020,12,15), *range1) == dt(2012,12,15)
+
+    assert closest_date(dt(2013,1,15), *range1) == dt(2013,1,15)
+    assert closest_date(dt(2000,1,15), *range1) == dt(2013,1,15)
+    assert closest_date(dt(2020,1,15), *range1) == dt(2013,1,15)
+
+    assert closest_date(dt(2013,1,1), *range1) == dt(2013,1,1)
+    assert closest_date(dt(2000,1,1), *range1) == dt(2013,1,1)
+    assert closest_date(dt(2020,1,1), *range1) == dt(2013,1,1)
+
+    range2 = [dt(2012,12,20), dt(2014,1,10)]
+    assert closest_date(dt(2012,12,15), *range2) == dt(2013,12,15)
+    assert closest_date(dt(2014,1,15), *range2) == dt(2013,1,15)

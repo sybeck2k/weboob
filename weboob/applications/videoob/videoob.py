@@ -53,8 +53,8 @@ class VideoListFormatter(PrettyFormatter):
 
 class Videoob(ReplApplication):
     APPNAME = 'videoob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2010-2011 Christophe Benz, Romain Bignon, John Obbele'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2010-YEAR Christophe Benz, Romain Bignon, John Obbele'
     DESCRIPTION = "Console application allowing to search for videos on various websites, " \
                   "play and download them and get information."
     SHORT_DESCRIPTION = "search and play videos"
@@ -109,7 +109,7 @@ class Videoob(ReplApplication):
                         line = u'%s/%s' % (baseurl, line)
                     content += (line,)
 
-            args = ('wget',) + content + ('-O', dest)
+            args = ('wget', '-nv',) + content + ('-O', dest)
         else:
             if check_exec('wget'):
                 args = ('wget', '-c', video.url, '-O', dest)
@@ -337,5 +337,5 @@ class Videoob(ReplApplication):
 
         self.change_path([u'search'])
         self.start_format(pattern=pattern)
-        for backend, video in self.do('search_videos', pattern=pattern, nsfw=self.nsfw):
+        for video in self.do('search_videos', pattern=pattern, nsfw=self.nsfw):
             self.cached_format(video)

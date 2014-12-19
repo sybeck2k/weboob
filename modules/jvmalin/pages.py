@@ -5,13 +5,14 @@ import datetime
 
 from weboob.capabilities.travel import RoadmapError
 from weboob.tools.misc import to_unicode
-from weboob.tools.mech import ClientForm
-from weboob.tools.browser import Page
+from weboob.deprecated.mech import ClientForm
+from weboob.deprecated.browser import Page
 
 
 class RoadmapAmbiguity(RoadmapError):
     def __init__(self, error):
         RoadmapError.__init__(self, error)
+
 
 class RoadmapSearchPage(Page):
     def search(self, departure, arrival, departure_time, arrival_time):
@@ -20,7 +21,7 @@ class RoadmapSearchPage(Page):
         for form in self.browser.forms():
             try:
                 if form.attrs['id'] == 'rech-iti':
-                     match = i
+                    match = i
             except KeyError:
                 pass
             i += 1
@@ -41,10 +42,11 @@ class RoadmapSearchPage(Page):
             try:
                 self.browser['dateFull'] = '%02d/%02d/%d' % (time.day, time.month, time.year)
                 self.browser['hour'] = ['%02d' % time.hour]
-                self.browser['minute'] = ['%02d' % (time.minute - (time.minute%5))]
+                self.browser['minute'] = ['%02d' % (time.minute - (time.minute % 5))]
             except ClientForm.ItemNotFoundError:
                 raise RoadmapError('Unable to establish a roadmap with %s time at "%s"' % ('departure' if departure_time else 'arrival', time))
         self.browser.submit()
+
 
 class RoadmapResultsPage(Page):
     def html_br_strip(self, text):
@@ -61,7 +63,7 @@ class RoadmapResultsPage(Page):
         if len(best) == 0:
             best = self.parser.select(self.document.getroot(), 'div.bloc-iti')
             if len(best) == 0:
-                raise RoadmapError('Unable to get the best roadmap');
+                raise RoadmapError('Unable to get the best roadmap')
 
         link = self.parser.select(best[0], 'a.btn-submit')
         if len(link) == 0:
@@ -96,6 +98,7 @@ class RoadmapResultsPage(Page):
         self.browser[propname] = [ propvalue ]
         self.browser.submit()
 
+
 class RoadmapPage(Page):
     def get_steps(self):
         errors = []
@@ -111,14 +114,14 @@ class RoadmapPage(Page):
         for tr in self.parser.select(self.document.getroot(), 'table.itineraire-detail tr'):
             if current_step is None:
                 current_step = {
-                  'id': i,
-                  'start_time': datetime.datetime.now(),
-                  'end_time': datetime.datetime.now(),
-                  'line': '',
-                  'departure': '',
-                  'arrival': '',
-                  'duration': datetime.timedelta()
-                    }
+                    'id': i,
+                    'start_time': datetime.datetime.now(),
+                    'end_time': datetime.datetime.now(),
+                    'line': '',
+                    'departure': '',
+                    'arrival': '',
+                    'duration': datetime.timedelta()
+                }
 
             if 'class' in tr.attrib:
                 if 'bg-ligne' in tr.attrib['class']:
@@ -128,7 +131,7 @@ class RoadmapPage(Page):
                     continue
 
             for td in self.parser.select(tr, 'td'):
-                if not 'class' in td.attrib:
+                if 'class' not in td.attrib:
                     continue
 
                 if 'iti-inner' in td.attrib['class']:
@@ -142,7 +145,7 @@ class RoadmapPage(Page):
                                 if len(current_step['line']) > 0 and \
                                    len(current_step['departure']) > 0 and \
                                    len(current_step['arrival']) > 0:
-                                    current_step['line'] = to_unicode("%s : %s" % \
+                                    current_step['line'] = to_unicode("%s : %s" %
                                         (current_step['mode'], current_step['line']))
                                     del current_step['mode']
                                     yield current_step

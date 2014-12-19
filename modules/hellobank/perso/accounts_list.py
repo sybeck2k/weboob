@@ -18,12 +18,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-
 from decimal import Decimal
 
 from weboob.capabilities.bank import Account
-from weboob.tools.browser import Page, BrowserPasswordExpired
+from weboob.deprecated.browser import Page, BrowserPasswordExpired
 from weboob.tools.json import json
 
 
@@ -67,7 +65,7 @@ class AccountsList(Page):
                 l.append(account)
 
         if len(l) == 0:
-            print('no accounts')
+            self.logger.warning('no accounts')
             # oops, no accounts? check if we have not exhausted the allowed use
             # of this password
             for img in self.document.getroot().cssselect('img[align="middle"]'):

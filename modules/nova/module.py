@@ -25,8 +25,8 @@ from weboob.capabilities.audiostream import BaseAudioStream
 from weboob.tools.capabilities.streaminfo import StreamInfo
 from weboob.capabilities.collection import CapCollection
 from weboob.tools.backend import Module
-from weboob.tools.browser import StandardBrowser
-from weboob.tools.parsers import get_parser
+from weboob.deprecated.browser import StandardBrowser
+from weboob.deprecated.browser.parsers import get_parser
 
 
 __all__ = ['NovaModule']
@@ -36,7 +36,7 @@ class NovaModule(Module, CapRadio, CapCollection):
     NAME = 'nova'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Nova French radio'
     LICENSE = 'AGPLv3+'
     BROWSER = StandardBrowser
@@ -63,7 +63,7 @@ class NovaModule(Module, CapRadio, CapCollection):
         if not isinstance(radio, Radio):
             radio = Radio(radio)
 
-        if not radio.id in self._RADIOS:
+        if radio.id not in self._RADIOS:
             return None
 
         title, description, url = self._RADIOS[radio.id]

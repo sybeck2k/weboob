@@ -18,18 +18,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-
-from weboob.tools.mech import ClientForm
+from weboob.deprecated.mech import ClientForm
 ControlNotFoundError = ClientForm.ControlNotFoundError
 
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 
 import re
 import datetime
 
 from weboob.capabilities.base import NotAvailable
-from weboob.tools.browser import BrokenPageError
+from weboob.deprecated.browser import BrokenPageError
 
 from .video import EuroparlVideo
 
@@ -75,7 +73,6 @@ class VideoPage(Page):
         obj = self.parser.select(self.document.getroot(), 'meta[name=available]', 1)
         if obj is not None:
             value = obj.attrib['content']
-            print(value)
             m = re.match('(\d\d)-(\d\d)-(\d\d\d\d)\s*(\d\d):(\d\d)', value)
             if not m:
                 raise BrokenPageError('Unable to parse datetime: %r' % value)

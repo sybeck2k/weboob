@@ -18,12 +18,16 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 from weboob.capabilities.bank import Account, Transaction
-from weboob.browser2.page import Page, HTMLPage, LoggedPage, RawPage
+from weboob.tools.capabilities.bank.transactions import \
+    AmericanTransaction as AmTr
+from weboob.browser.pages import HTMLPage, LoggedPage, RawPage
 from urllib import unquote
-from .parsers import StatementParser, clean_amount, clean_label
+from requests.cookies import morsel_to_cookie
+from .parsers import StatementParser, clean_label
 import itertools
 import re
 import datetime
+import Cookie
 
 
 class LoginPage(HTMLPage):
@@ -34,12 +38,28 @@ class LoginPage(HTMLPage):
         form.submit()
 
 
+class LoginProceedPage(LoggedPage, HTMLPage):
+    is_here = '//script[contains(text(),"setAndCheckCookie")]'
+
+    def proceed(self):
+        script = self.doc.xpath('//script/text()')[0]
+        cookieStr = re.match('.*document\.cookie = "([^"]+)".*',
+                             script, re.DOTALL).group(1)
+        morsel = Cookie.Cookie(cookieStr).values()[0]
+        self.browser.session.cookies.set_cookie(morsel_to_cookie(morsel))
+        form = self.get_form()
+        return form.submit()
+
+
 class LoginRedirectPage(LoggedPage, HTMLPage):
+    is_here = 'contains(//meta[@http-equiv="Refresh"]/@content,' \
+                       '"SIGNON_PORTAL_PAUSE")'
+
     def redirect(self):
         refresh = self.doc.xpath(
             '//meta[@http-equiv="Refresh"]/@content')[0]
         url = re.match(r'^.*URL=(.*)$', refresh).group(1)
-        self.browser.location(url)
+        return self.browser.location(url)
 
 
 class LoggedInPage(HTMLPage):
@@ -50,6 +70,8 @@ class LoggedInPage(HTMLPage):
 
 
 class SummaryPage(LoggedInPage):
+    is_here = u'//title[contains(text(),"Account Summary")]'
+
     def to_activity(self):
         href = self.doc.xpath(u'//a[text()="Account Activity"]/@href')[0]
         self.browser.location(href)
@@ -60,45 +82,7 @@ class SummaryPage(LoggedInPage):
         self.browser.location(href)
 
 
-class DynamicPage(Page):
-    """
-    Most of Wells Fargo pages have the same URI pattern.
-    Some of these pages are HTML, some are PDF.
-    """
-    def __init__(self, browser, response, *args, **kwargs):
-        super(DynamicPage, self).__init__(browser, response, *args, **kwargs)
-        # Ugly hack to figure out the page type
-        klass = RawPage if response.content[:4] == '%PDF' else HTMLPage
-        self.doc = klass(browser, response, *args, **kwargs).doc
-        subclass = None
-        # Ugly hack to figure out the page type
-        if response.content[:4] == '%PDF':
-            subclass = StatementSubPage
-        elif u'Account Activity' in self._title():
-            name = self._account_name()
-            if u'CHECKING' in name or u'SAVINGS' in name:
-                subclass = ActivityCashSubPage
-            elif u'CARD' in name:
-                subclass = ActivityCardSubPage
-        elif u'Statements & Documents' in self._title():
-            subclass = StatementsSubPage
-        assert subclass
-        self.subpage = subclass(browser, response, *args, **kwargs)
-
-    @property
-    def logged(self):
-        return self.subpage.logged
-
-    def _title(self):
-        return self.doc.xpath(u'//title/text()')[0]
-
-    def _account_name(self):
-        return self.doc.xpath(
-            u'//select[@name="selectedAccountUID"]'
-            u'/option[@selected="selected"]/text()')[0]
-
-
-class AccountSubPage(LoggedInPage):
+class AccountPage(LoggedInPage):
     def account_id(self, name=None):
         if name:
             return name[-4:] # Last 4 digits of "BLAH XXXXXXX1234"
@@ -106,9 +90,10 @@ class AccountSubPage(LoggedInPage):
             return self.account_id(self.account_name())
 
 
-class ActivitySubPage(AccountSubPage):
-    def is_activity(self):
-        return True
+class ActivityPage(AccountPage):
+    def is_here(self):
+        return bool(self.doc.xpath(
+            u'contains(//title/text(),"Account Activity")'))
 
     def accounts_names(self):
         return self.doc.xpath(
@@ -128,9 +113,10 @@ class ActivitySubPage(AccountSubPage):
                 u'/option[@selected="selected"]/@value')[0]
 
     def account_name(self):
-        return self.doc.xpath(
-            u'//select[@name="selectedAccountUID"]'
-            u'/option[@selected="selected"]/text()')[0]
+        for name in self.doc.xpath(u'//select[@name="selectedAccountUID"]'
+                                   u'/option[@selected="selected"]/text()'):
+            return name
+        return u''
 
     def account_type(self, name=None):
         raise NotImplementedError()
@@ -154,7 +140,7 @@ class ActivitySubPage(AccountSubPage):
         account.id = id_
         account.label = name
         account.currency = currency
-        account.balance = clean_amount(balance)
+        account.balance = AmTr.decimal_amount(balance)
         account.type = type_
         return account
 
@@ -168,7 +154,12 @@ class ActivitySubPage(AccountSubPage):
         raise NotImplementedError()
 
 
-class ActivityCashSubPage(ActivitySubPage):
+class ActivityCashPage(ActivityPage):
+    def is_here(self):
+        return super(ActivityCashPage, self).is_here() and \
+            (u'CHECKING' in self.account_name() or
+             u'SAVINGS' in self.account_name())
+
     def account_type(self, name=None):
         name = name or self.account_name()
         if u'CHECKING' in name:
@@ -207,9 +198,9 @@ class ActivityCashSubPage(ActivitySubPage):
             desc = clean_label(desc)
 
             deposit = deposit.strip()
-            deposit = clean_amount(deposit or '0')
+            deposit = AmTr.decimal_amount(deposit or '0')
             withdraw = withdraw.strip()
-            withdraw = clean_amount(withdraw or '0')
+            withdraw = AmTr.decimal_amount(withdraw or '0')
 
             amount = deposit - withdraw
 
@@ -231,7 +222,11 @@ class ActivityCashSubPage(ActivitySubPage):
             return False
 
 
-class ActivityCardSubPage(ActivitySubPage):
+class ActivityCardPage(ActivityPage):
+    def is_here(self):
+        return super(ActivityCardPage, self).is_here() and \
+            u'CARD' in self.account_name()
+
     def account_type(self, name=None):
         return Account.TYPE_CARD
 
@@ -240,7 +235,7 @@ class ActivityCardSubPage(ActivitySubPage):
             u'//td[@headers="outstandingBalance"]/text()')[0]
 
     def get_account(self):
-        account = ActivitySubPage.get_account(self)
+        account = ActivityPage.get_account(self)
 
         # Credit card is essentially a liability.
         # Negative amount means there's a payment due.
@@ -280,9 +275,9 @@ class ActivityCardSubPage(ActivitySubPage):
             ref = re.match('.*<REFERENCE ([^>]+)>.*', ref).group(1)
 
             if amount.startswith('+'):
-                amount = clean_amount(amount[1:])
+                amount = AmTr.decimal_amount(amount[1:])
             else:
-                amount = -clean_amount(amount)
+                amount = -AmTr.decimal_amount(amount)
 
             trans = Transaction(ref)
             trans.date = tdate
@@ -298,9 +293,8 @@ class ActivityCardSubPage(ActivitySubPage):
         return False
 
 
-class StatementsSubPage(AccountSubPage):
-    def is_statements(self):
-        return True
+class StatementsPage(AccountPage):
+    is_here = u'contains(//title/text(),"Statements")'
 
     def account_name(self):
         return self.doc.xpath(
@@ -344,13 +338,13 @@ class StatementsSubPage(AccountSubPage):
             yield unquote(inner_uri)
 
 
-class StatementSubPage(LoggedPage, RawPage):
+class StatementPage(LoggedPage, RawPage):
     def __init__(self, *args, **kwArgs):
         RawPage.__init__(self, *args, **kwArgs)
         self._parser = StatementParser(self.doc)
 
-    def is_statement(self):
-        return True
+    def is_here(self):
+        return self.doc[:4] == '%PDF'
 
     def iter_transactions(self):
         # Maintain a nice consistent newer-to-older order of transactions.
@@ -361,4 +355,3 @@ class StatementSubPage(LoggedPage, RawPage):
             cmp=lambda t1, t2: cmp(t2.date, t1.date) or
                                cmp(t1.label, t2.label) or
                                cmp(t1.amount, t2.amount))
-

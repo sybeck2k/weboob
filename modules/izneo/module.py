@@ -18,13 +18,12 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 import re
 
 from weboob.capabilities.gallery import CapGallery, BaseGallery, BaseImage
 from weboob.tools.json import json
 from weboob.tools.backend import Module
-from weboob.tools.browser import Browser, Page
+from weboob.deprecated.browser import Browser, Page
 
 __all__ = ['IzneoModule']
 
@@ -65,7 +64,7 @@ class IzneoModule(Module, CapGallery):
     NAME = 'izneo'
     MAINTAINER = u'Roger Philibert'
     EMAIL = 'roger.philibert@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'Izneo digital comics'
     LICENSE = 'AGPLv3+'
     BROWSER = IzneoBrowser

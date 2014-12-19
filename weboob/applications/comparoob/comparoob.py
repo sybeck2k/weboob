@@ -74,8 +74,8 @@ class PricesFormatter(PrettyFormatter):
 
 class Comparoob(ReplApplication):
     APPNAME = 'comparoob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2012 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2012-YEAR Romain Bignon'
     DESCRIPTION = "Console application to compare products."
     SHORT_DESCRIPTION = "compare products"
     DEFAULT_FORMATTER = 'table'
@@ -95,7 +95,7 @@ class Comparoob(ReplApplication):
         what product to compare.
         """
         products = []
-        for backend, product in self.do('search_products', pattern):
+        for product in self.do('search_products', pattern):
             double = False
             for prod in products:
                 if product.name == prod.name:
@@ -124,7 +124,7 @@ class Comparoob(ReplApplication):
         self.change_path([u'prices'])
         self.start_format()
         products = []
-        for backend, price in self.do('iter_prices', product):
+        for price in self.do('iter_prices', product):
             products.append(price)
         for price in sorted(products, key=self._get_price):
             self.cached_format(price)

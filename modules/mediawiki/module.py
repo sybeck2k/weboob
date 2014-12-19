@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.tools.backend import Module, BackendConfig
 from weboob.capabilities.content import CapContent, Content
 from weboob.tools.value import ValueBackendPassword, Value
@@ -34,7 +33,7 @@ class MediawikiModule(Module, CapContent):
     NAME = 'mediawiki'
     MAINTAINER = u'Clément Schreiner'
     EMAIL = 'clemux@clemux.info'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = 'Wikis running MediaWiki, like Wikipedia'
     CONFIG = BackendConfig(Value('url',      label='URL of the Mediawiki website', default='http://en.wikipedia.org/', regexp='https?://.*'),

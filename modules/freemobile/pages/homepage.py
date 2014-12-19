@@ -19,10 +19,9 @@
 
 from .history import BadUTF8Page
 from weboob.capabilities.bill import Subscription
-from weboob.browser2.page import method
-from weboob.browser2.elements import ListElement, ItemElement
-from weboob.browser2.filters.standard import CleanText, Field, Format, Filter
-from weboob.browser2.filters.html import Attr
+from weboob.browser.elements import ListElement, ItemElement, method
+from weboob.browser.filters.standard import CleanText, Field, Format, Filter
+from weboob.browser.filters.html import Attr
 
 
 class GetID(Filter):
@@ -38,7 +37,7 @@ class HomePage(BadUTF8Page):
         class item(ItemElement):
             klass = Subscription
 
-            obj_subscriber = CleanText('div[@class="idAbonne pointer"]/p[1]', symbols='-', childs=False)
+            obj_subscriber = CleanText('div[@class="idAbonne pointer"]/p[1]', symbols='-', children=False)
             obj_id = CleanText('div[@class="idAbonne pointer"]/p/span')
             obj__login = GetID(Attr('.//div[@class="acceuil_btn"]/a', 'href'))
             obj_label = Format(u'%s - %s', Field('id'), CleanText('//div[@class="forfaitChoisi"]'))

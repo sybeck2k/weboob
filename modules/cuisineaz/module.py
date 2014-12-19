@@ -26,6 +26,7 @@ import unicodedata
 
 __all__ = ['CuisineazModule']
 
+
 def strip_accents(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
@@ -34,7 +35,7 @@ class CuisineazModule(Module, CapRecipe):
     NAME = 'cuisineaz'
     MAINTAINER = u'Julien Veyssier'
     EMAIL = 'julien.veyssier@aiur.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Cuisine AZ French recipe website'
     LICENSE = 'AGPLv3+'
     BROWSER = CuisineazBrowser

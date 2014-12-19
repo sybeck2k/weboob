@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.bank import CapBank, AccountNotFound
 from weboob.capabilities.base import find_object
 from weboob.tools.backend import Module, BackendConfig
@@ -34,7 +33,7 @@ class OneyModule(Module, CapBank):
     NAME = 'oney'
     MAINTAINER = u'Vincet Paredes'
     EMAIL = 'vparedes@budget-insight.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = 'Oney'
     CONFIG = BackendConfig(ValueBackendPassword('login',      label='Identifiant', masked=False),

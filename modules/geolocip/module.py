@@ -18,10 +18,9 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.geolocip import CapGeolocIp, IpLocation
 from weboob.tools.backend import Module
-from weboob.tools.browser import Browser, BrowserUnavailable
+from weboob.deprecated.browser import Browser, BrowserUnavailable
 
 
 __all__ = ['GeolocIpModule']
@@ -31,7 +30,7 @@ class GeolocIpModule(Module, CapGeolocIp):
     NAME = 'geolocip'
     MAINTAINER = u'Julien Veyssier'
     EMAIL = 'julien.veyssier@aiur.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u"GeolocIP IP addresses geolocation service"
     BROWSER = Browser

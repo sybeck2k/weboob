@@ -21,7 +21,7 @@ import re
 
 from weboob.capabilities.base import UserError
 from weboob.capabilities.image import BaseImage
-from weboob.tools.browser import Page, BrokenPageError
+from weboob.deprecated.browser import Page, BrokenPageError
 from weboob.capabilities import NotAvailable
 
 
@@ -32,7 +32,7 @@ class IndexPage(Page):
     def iter_videos(self):
         videos = self.document.getroot().cssselect("div[class=bloc-contenu-8]")
         for div in videos:
-            title = self.parser.select(div, 'a.typo-titre', 1).text_content().replace('  ', ' ')
+            title = self.parser.select(div, 'h1', 1).text_content().replace('  ', ' ')
             m = re.match(r'/contenu.php\?id=(.*)', div.find('a').attrib['href'])
             _id = ''
             if m:

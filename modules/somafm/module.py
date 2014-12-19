@@ -24,8 +24,8 @@ from weboob.capabilities.audiostream import BaseAudioStream
 from weboob.tools.capabilities.streaminfo import StreamInfo
 from weboob.capabilities.collection import CapCollection
 from weboob.tools.backend import Module
-from weboob.tools.browser import StandardBrowser
-from weboob.tools.parsers.iparser import IParser
+from weboob.deprecated.browser import StandardBrowser
+from weboob.deprecated.browser.parsers.iparser import IParser
 
 
 __all__ = ['SomaFMModule']
@@ -40,7 +40,7 @@ class SomaFMModule(Module, CapRadio, CapCollection):
     NAME = 'somafm'
     MAINTAINER = u'Roger Philibert'
     EMAIL = 'roger.philibert@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'SomaFM web radio'
     LICENSE = 'AGPLv3+'
     BROWSER = StandardBrowser
@@ -125,4 +125,3 @@ class SomaFMModule(Module, CapRadio, CapCollection):
         return radio
 
     OBJECTS = {Radio: fill_radio}
-

@@ -22,7 +22,7 @@ import datetime
 from decimal import Decimal
 import re
 
-from weboob.tools.browser import Page, BrokenPageError
+from weboob.deprecated.browser import Page, BrokenPageError
 from weboob.capabilities.bank import Account
 from weboob.capabilities import NotAvailable
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction as Transaction
@@ -56,6 +56,7 @@ class AccountsPage(Page):
 
             yield a
 
+
 class TransactionsPage(Page):
     COL_ID = 0
     COL_DATE = 1
@@ -81,6 +82,7 @@ class TransactionsPage(Page):
                     return datetime.date(int(m.group(3)),
                                          self.MONTHS.index(m.group(2).rstrip('.')) + 1,
                                          int(m.group(1)))
+
     def get_beginning_debit_date(self):
         for option in self.document.xpath('//select[@id="viewPeriod"]/option'):
             if 'selected' in option.attrib:

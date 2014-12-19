@@ -44,6 +44,7 @@ class BackendStorage(object):
     :param storage: storage object
     :type storage: :class:`weboob.tools.storage.IStorage`
     """
+
     def __init__(self, name, storage):
         self.name = name
         self.storage = storage
@@ -268,6 +269,8 @@ class Module(object):
         self.weboob = weboob
         self.name = name
         self.lock = RLock()
+        if config is None:
+            config = {}
 
         # Private fields (which start with '_')
         self._private_config = dict((key, value) for key, value in config.iteritems() if key.startswith('_'))
@@ -332,9 +335,9 @@ class Module(object):
         if any((tmpproxy, tmpproxys)):
             kwargs['proxy'] = {}
             if tmpproxy is not None:
-              kwargs['proxy']['http'] = tmpproxy
+                kwargs['proxy']['http'] = tmpproxy
             if tmpproxys is not None:
-              kwargs['proxy']['https'] = tmpproxys
+                kwargs['proxy']['https'] = tmpproxys
 
 
         kwargs['logger'] = self.logger

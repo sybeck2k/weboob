@@ -28,8 +28,8 @@ __all__ = ['Geolooc']
 
 class Geolooc(ReplApplication):
     APPNAME = 'geolooc'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2010-2011 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2010-YEAR Romain Bignon'
     DESCRIPTION = "Console application allowing to geolocalize IP addresses."
     SHORT_DESCRIPTION = "geolocalize IP addresses"
     CAPS = CapGeolocIp
@@ -39,5 +39,5 @@ class Geolooc(ReplApplication):
             print('Syntax: %s ipaddr' % argv[0], file=self.stderr)
             return 2
 
-        for backend, location in self.do('get_location', argv[1]):
+        for location in self.do('get_location', argv[1]):
             self.format(location)

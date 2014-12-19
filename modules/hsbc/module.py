@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.bank import CapBank, AccountNotFound
 from weboob.capabilities.base import find_object
 from weboob.tools.backend import Module, BackendConfig
@@ -34,7 +33,7 @@ class HSBCModule(Module, CapBank):
     NAME = 'hsbc'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = 'HSBC France'
     CONFIG = BackendConfig(ValueBackendPassword('login',      label='Identifiant', masked=False),

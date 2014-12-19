@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from weboob.tools.browser import Browser
+from weboob.deprecated.browser import Browser
 from .pages import LivePage, ProgramPage
 
 __all__ = ['NihonNoOtoBrowser']
+
 
 class NihonNoOtoBrowser(Browser):
     DOMAIN = 'www.nihon-no-oto.com'

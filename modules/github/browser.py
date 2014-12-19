@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.tools.browser import Browser
+from weboob.deprecated.browser import Browser
 from weboob.tools.json import json as json_module
 from base64 import b64encode
 import datetime
@@ -28,7 +28,6 @@ from urllib import quote_plus
 
 
 __all__ = ['GithubBrowser']
-
 
 
 class GithubBrowser(Browser):
@@ -198,6 +197,7 @@ class GithubBrowser(Browser):
 
 # TODO use a cache for objects and/or pages?
 # TODO use an api-key?
+
 
 def parse_date(s):
     if s.endswith('Z'):

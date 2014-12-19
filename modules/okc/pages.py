@@ -20,11 +20,12 @@
 import re
 from datetime import datetime
 
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 from weboob.tools.ordereddict import OrderedDict
 from weboob.capabilities.contact import ProfileNode
 from weboob.tools.html import html2text
 from weboob.tools.date import local2utc
+
 
 class LoginPage(Page):
     def login(self, username, password):
@@ -162,7 +163,7 @@ class ProfilePage(Page):
             if 'looking for' in label:
                 for i, li in enumerate(val.xpath('.//li')):
                     profile['data']['look_for'].value['look_for_%s' % i] = ProfileNode('look_for_%s' % i, '', li.text.strip())
-            elif 'summary' in label and not 'summary' in profile:
+            elif 'summary' in label and 'summary' not in profile:
                 profile['summary'] = txt
             else:
                 key = label.replace(' ', '_')
@@ -191,6 +192,7 @@ class PostMessagePage(Page):
         self.browser['body'] = content.encode('utf-8')
         self.browser.submit()
 
+
 class VisitsPage(Page):
     def get_visits(self):
         ul_item = self.parser.select(self.document.getroot(), '//*[@id="page_content"]/ul[3]', method='xpath')[0]
@@ -205,6 +207,7 @@ class VisitsPage(Page):
                 'date': visitor_timestamp
             })
         return visitors
+
 
 class QuickMatchPage(Page):
     def get_id(self):

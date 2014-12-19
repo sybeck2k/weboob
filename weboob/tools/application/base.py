@@ -23,6 +23,7 @@ from __future__ import print_function
 import logging
 import optparse
 from optparse import OptionGroup, OptionParser
+from datetime import datetime
 import locale
 import os
 import sys
@@ -32,8 +33,8 @@ from weboob.capabilities.base import ConversionWarning, BaseObject
 from weboob.core import Weboob, CallErrors
 from weboob.core.backendscfg import BackendsConfig
 from weboob.tools.config.iconfig import ConfigError
-from weboob.core.exceptions import FormFieldConversionWarning
-from weboob.tools.log import createColoredFormatter, getLogger, DebugFilter, settings as log_settings
+from weboob.exceptions import FormFieldConversionWarning
+from weboob.tools.log import createColoredFormatter, getLogger, DEBUG_FILTERS, settings as log_settings
 from weboob.tools.misc import to_unicode
 from .results import ResultsConditionError
 
@@ -164,7 +165,7 @@ class Application(object):
         self._parser.add_option('-e', '--exclude-backends', help='what backend(s) to exclude (comma separated)')
         self._parser.add_option('-I', '--insecure', action='store_true', help='do not validate SSL')
         logging_options = OptionGroup(self._parser, 'Logging Options')
-        logging_options.add_option('-d', '--debug', action='count', help='display debug messages')
+        logging_options.add_option('-d', '--debug', action='count', help='display debug messages. Set up it twice to more verbosity')
         logging_options.add_option('-q', '--quiet', action='store_true', help='display only error messages')
         logging_options.add_option('-v', '--verbose', action='store_true', help='display info messages')
         logging_options.add_option('--logging-file', action='store', type='string', dest='logging_file', help='file to save logs')
@@ -204,7 +205,7 @@ class Application(object):
 
         if path is None:
             path = os.path.join(self.CONFDIR, self.APPNAME + '.storage')
-        elif not os.path.sep in path:
+        elif os.path.sep not in path:
             path = os.path.join(self.CONFDIR, path)
 
         storage = klass(path)
@@ -232,7 +233,7 @@ class Application(object):
 
         if path is None:
             path = os.path.join(self.CONFDIR, self.APPNAME)
-        elif not os.path.sep in path:
+        elif os.path.sep not in path:
             path = os.path.join(self.CONFDIR, path)
 
         self.config = klass(path)
@@ -260,7 +261,8 @@ class Application(object):
         version = None
         if self.VERSION:
             if self.COPYRIGHT:
-                version = '%s v%s %s' % (self.APPNAME, self.VERSION, self.COPYRIGHT)
+                copyright = self.COPYRIGHT.replace('YEAR', '%d' % datetime.today().year)
+                version = '%s v%s %s' % (self.APPNAME, self.VERSION, copyright)
             else:
                 version = '%s v%s' % (self.APPNAME, self.VERSION)
         return version
@@ -278,8 +280,13 @@ class Application(object):
 
     def _do_complete_iter(self, backend, count, fields, res):
         modif = 0
+
         for i, sub in enumerate(res):
             sub = self._do_complete_obj(backend, fields, sub)
+            if self.condition and self.condition.limit and \
+               self.condition.limit == i:
+                return
+
             if self.condition and not self.condition.is_valid(sub):
                 modif += 1
             else:
@@ -314,7 +321,7 @@ class Application(object):
             return False
 
         print(u'Error(%s): %s' % (backend.name, error), file=self.stderr)
-        if logging.root.level == logging.DEBUG:
+        if logging.root.level <= logging.DEBUG:
             print(backtrace, file=self.stderr)
         else:
             return True
@@ -348,13 +355,15 @@ class Application(object):
         if self.options.shell_completion:
             items = set()
             for option in self._parser.option_list:
-                if not option.help is optparse.SUPPRESS_HELP:
+                if option.help is not optparse.SUPPRESS_HELP:
                     items.update(str(option).split('/'))
             items.update(self._get_completions())
             print(' '.join(items))
             sys.exit(0)
 
-        if self.options.debug or self.options.save_responses:
+        if self.options.debug >= self.DEBUG_FILTER:
+            level = DEBUG_FILTERS
+        elif self.options.debug or self.options.save_responses:
             level = logging.DEBUG
         elif self.options.verbose:
             level = logging.INFO
@@ -391,19 +400,15 @@ class Application(object):
         self._handle_options()
         self.handle_application_options()
 
-        if self.options.debug < self.DEBUG_FILTER:
-            for handler in handlers:
-                handler.addFilter(DebugFilter())
-
         return args
 
     @classmethod
     def create_default_logger(cls):
-        # stdout logger
+        # stderr logger
         format = '%(asctime)s:%(levelname)s:%(name)s:' + cls.VERSION +\
                  ':%(filename)s:%(lineno)d:%(funcName)s %(message)s'
-        handler = logging.StreamHandler(cls.stdout)
-        handler.setFormatter(createColoredFormatter(cls.stdout, format))
+        handler = logging.StreamHandler(cls.stderr)
+        handler.setFormatter(createColoredFormatter(cls.stderr, format))
         return handler
 
     @classmethod

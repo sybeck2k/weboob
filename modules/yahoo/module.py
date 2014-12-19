@@ -24,7 +24,7 @@ from dateutil.parser import parse as parse_dt
 
 from weboob.capabilities.weather import CapWeather, CityNotFound, Current, Forecast, City
 from weboob.tools.backend import Module
-from weboob.tools.browser import StandardBrowser
+from weboob.deprecated.browser import StandardBrowser
 
 
 __all__ = ['YahooModule']
@@ -34,7 +34,7 @@ class YahooModule(Module, CapWeather):
     NAME = 'yahoo'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'Yahoo!'
     LICENSE = 'AGPLv3+'
     BROWSER = StandardBrowser

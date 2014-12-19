@@ -18,15 +18,16 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.tools.browser import Browser, BrowserIncorrectPassword
+from weboob.deprecated.browser import Browser, BrowserIncorrectPassword
 
 import urllib
 
-from weboob.tools.browser.decorators import id2url
+from weboob.deprecated.browser.decorators import id2url
 from .video import NolifeTVVideo
 from .pages import VideoPage, VideoListPage, FamilyPage, AboPage, LoginPage, HomePage
 
 __all__ = ['NolifeTVBrowser']
+
 
 class NolifeTVBrowser(Browser):
     USER_AGENT = Browser.USER_AGENTS['desktop_firefox']

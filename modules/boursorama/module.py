@@ -34,7 +34,7 @@ class BoursoramaModule(Module, CapBank):
     NAME = 'boursorama'
     MAINTAINER = u'Gabriel Kerneis'
     EMAIL = 'gabriel@kerneis.info'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u'Boursorama'
     CONFIG = BackendConfig(ValueBackendPassword('login',      label='Identifiant', masked=False),
@@ -69,6 +69,11 @@ class BoursoramaModule(Module, CapBank):
         with self.browser:
             for history in self.browser.get_history(account):
                 yield history
+
+    def iter_investment(self, account):
+        with self.browser:
+            for investment in self.browser.get_investment(account):
+                yield investment
 
     # TODO
     #def iter_coming(self, account):

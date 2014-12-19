@@ -18,8 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.library import CapBook
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword, Value
@@ -34,7 +32,7 @@ class AloesModule(Module, CapBook):
     NAME = 'opacwebaloes'
     MAINTAINER = u'Jeremy Monnet'
     EMAIL = 'jmonnet@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'Aloes Library software'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(Value('login',    label='Account ID', regexp='^\d{1,8}\w$'),

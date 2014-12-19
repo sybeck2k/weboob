@@ -22,7 +22,7 @@ from urlparse import parse_qs, urlsplit
 
 from weboob.capabilities.torrent import Torrent
 from weboob.capabilities.base import NotAvailable, NotLoaded
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 from weboob.tools.misc import get_bytes_size
 
 
@@ -32,7 +32,7 @@ class TorrentsPage(Page):
             if tr.attrib.get('class', '') == 'odd' or tr.attrib.get('class', '') == ' even':
                 magnet = NotAvailable
                 url = NotAvailable
-                if not 'id' in tr.attrib:
+                if 'id' not in tr.attrib:
                     continue
                 title = self.parser.tocleanstring(tr.find('.//a[@class="cellMainLink"]'))
                 # WTF is that?

@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.tools.browser import Browser, BrowserIncorrectPassword
+from weboob.deprecated.browser import Browser, BrowserIncorrectPassword
 
 from .pages import LoginPage, HomePage, RentedPage, HistoryPage, BookedPage
 
@@ -61,7 +61,7 @@ class AloesBrowser(Browser):
         if not self.page.login(self.username, self.password) or \
             not self.is_logged() or \
                 (self.is_on_page(LoginPage) and self.page.is_error()):
-                raise BrowserIncorrectPassword()
+            raise BrowserIncorrectPassword()
 
     def get_rented_books_list(self):
         if not self.is_on_page(RentedPage):

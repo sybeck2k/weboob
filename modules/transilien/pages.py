@@ -18,16 +18,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-
 import re
 
-from weboob.browser2.page import JsonPage, HTMLPage, method
-from weboob.browser2.elements import TableElement, ItemElement, ListElement
+from weboob.browser.pages import JsonPage, HTMLPage
+from weboob.browser.elements import TableElement, ItemElement, ListElement, method
 from weboob.capabilities.travel import Station, Departure, RoadStep
-from weboob.browser2.filters.standard import CleanText, TableCell, Filter, DateTime, Env, Regexp, Duration
-from weboob.browser2.filters.json import Dict
-from weboob.browser2.filters.html import Link
+from weboob.capabilities import NotAvailable
+from weboob.browser.filters.standard import CleanText, TableCell, Filter, DateTime, Env, Regexp, Duration
+from weboob.browser.filters.json import Dict
+from weboob.browser.filters.html import Link
 from weboob.tools.date import LinearDateGuesser
 
 
@@ -41,7 +40,7 @@ class DictElement(ListElement):
 
 
 class RoadMapDuration(Duration):
-    regexp = re.compile(r'(?P<mn>\d+)')
+    _regexp = re.compile(r'(?P<mn>\d?)')
     kwargs = {'minutes': 'mn'}
 
 
@@ -61,8 +60,21 @@ class Child(Filter):
 class RoadMapPage(HTMLPage):
     def request_roadmap(self, station, arrival, arrival_date):
         form = self.get_form('//form[@id="cRechercheItineraire"]')
-        form['depart'] = station
-        form['arrivee'] = arrival
+        form['depart'] = '%s' % station
+        form['arrivee'] = '%s' % arrival
+        form.submit()
+
+    def is_ambiguous(self):
+        return self.doc.xpath('//select[@id="gare_arrivee_ambigu"] | //select[@id="gare_depart_ambigu"]')
+
+    def fix_ambiguity(self):
+        form = self.get_form('//form[@id="cRechercheItineraire"]')
+        if self.doc.xpath('//select[@id="gare_arrivee_ambigu"]'):
+            form['coordArrivee'] = self.doc.xpath('//select[@id="gare_arrivee_ambigu"]/option[@cat="STOP_AREA"]/@value')[0]
+
+        if self.doc.xpath('//select[@id="gare_depart_ambigu"]'):
+            form['coordDepart'] = self.doc.xpath('//select[@id="gare_depart_ambigu"]/option[@cat="STOP_AREA"]/@value')[0]
+
         form.submit()
 
     def get_roadmap(self):
@@ -144,7 +156,7 @@ class DeparturesPage2(HTMLPage):
             form['moiHoraire'] = '%s|%s' % (date.month, date.year)
             form['heureHoraire'] = date.hour
             form['minuteHoraire'] = date.minute
-        print(form)
+        self.logger.debug(form)
         form.submit()
 
 
@@ -168,10 +180,10 @@ class DeparturesPage(HTMLPage):
             def condition(self):
                 return len(self.el.xpath('./td')) >= 6
 
-            obj_time = DateTime(CleanText(TableCell('time')))
+            obj_time = TableCell('time') & CleanText & DateTime | NotAvailable
             obj_type = DepartureTypeFilter(TableCell('type'))
             obj_departure_station = CleanText(Env('station'))
             obj_arrival_station = CleanText(TableCell('arrival'))
-            obj_information = CleanText(TableCell('info'))
+            obj_information = TableCell('time') & CleanText & Regexp(pattern='([^\d:]+)') | u''
             obj_plateform = CleanText(TableCell('plateform'))
             obj_id = Regexp(Link(Child(TableCell('id'))), '.*?numeroTrain=(.*?)&.*?')

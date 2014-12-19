@@ -36,7 +36,7 @@ class VoyagesSNCFModule(Module, CapTravel):
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
     CONFIG = BackendConfig(Value('age', label='Passenger age', default='ADULT',
                                  choices=OrderedDict((('ADULT', '26-59 ans'),
                                                       ('SENIOR', '60 et +'),
@@ -90,7 +90,7 @@ class VoyagesSNCFModule(Module, CapTravel):
                 yield Station(_id, unicode(name))
         # ...then ones whose name contains pattern.
         for _id, name in enumerate(self.STATIONS):
-            if pattern in name.lower() and not _id in already:
+            if pattern in name.lower() and _id not in already:
                 yield Station(_id, unicode(name))
 
     def iter_station_departures(self, station_id, arrival_id=None, date=None):

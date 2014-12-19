@@ -35,7 +35,7 @@ class FeedlyModule(Module, CapMessages, CapCollection):
     MAINTAINER = u'Bezleputh'
     EMAIL = 'carton_ben@yahoo.fr'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
     STORAGE = {'seen': []}
     CONFIG = BackendConfig(Value('username', label='Username', default=''),
                            ValueBackendPassword('password', label='Password', default=''))
@@ -76,7 +76,7 @@ class FeedlyModule(Module, CapMessages, CapCollection):
         if entry is None:
             return None
 
-        if not thread.id in self.storage.get('seen', default=[]):
+        if thread.id not in self.storage.get('seen', default=[]):
             entry.flags = Message.IS_UNREAD
 
         entry.thread = thread

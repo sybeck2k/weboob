@@ -61,6 +61,7 @@ class Housing(BaseObject):
     phone =         StringField('Phone number to contact')
     photos =        Field('List of photos', list)
     details =       Field('Key/values of details', dict)
+    url =           StringField('Url of the the advert')
 
 
 class Query(BaseObject):
@@ -109,6 +110,7 @@ class CapHousing(Capability):
     """
     Capability of websites to search housings.
     """
+
     def search_housings(self, query):
         """
         Search housings.

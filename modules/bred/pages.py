@@ -19,13 +19,13 @@
 
 
 from mechanize import FormNotFoundError
-from weboob.tools.mech import ClientForm
+from weboob.deprecated.mech import ClientForm
 ControlNotFoundError = ClientForm.ControlNotFoundError
 
 from decimal import Decimal, InvalidOperation
 import re
 
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 from weboob.tools.misc import to_unicode
 from weboob.tools.ordereddict import OrderedDict
 from weboob.capabilities.bank import Account
@@ -153,7 +153,7 @@ class AccountsPage(BredBasePage):
             if a is None:
                 for a in cols[0].xpath('.//li/a'):
                     args = self.js2args(a.attrib['href'])
-                    if not 'numero_compte' in args or not 'numero_poste' in args:
+                    if 'numero_compte' not in args or 'numero_poste' not in args:
                         self.logger.warning('Card link with strange args: %s' % args)
                         continue
 
@@ -168,7 +168,7 @@ class AccountsPage(BredBasePage):
 
             args = self.js2args(a.attrib['href'])
 
-            if not 'numero_compte' in args or not 'numero_poste' in args:
+            if 'numero_compte' not in args or 'numero_poste' not in args:
                 self.logger.warning('Account link for %r with strange args: %s' % (a.attrib.get('alt', a.text), args))
                 continue
 

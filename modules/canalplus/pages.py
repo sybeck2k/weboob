@@ -20,7 +20,7 @@
 from datetime import datetime
 import re
 
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 from weboob.capabilities.collection import Collection
 from weboob.capabilities.base import NotAvailable, NotLoaded
 from weboob.capabilities.image import BaseImage
@@ -117,6 +117,6 @@ class VideoPage(Page):
     def get_video(self, video):
         _id = self.group_dict['id']
         for vid in self.document.getchildren():
-            if not _id in vid.find('ID').text:
+            if _id not in vid.find('ID').text:
                 continue
             return self.parse_video(vid, video)

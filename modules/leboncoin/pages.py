@@ -17,11 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 from decimal import Decimal
-from weboob.browser2.page import HTMLPage, method, pagination
-from weboob.browser2.elements import ItemElement, ListElement
-from weboob.browser2.filters.standard import CleanText, Regexp, CleanDecimal, Env, DateTime
-from weboob.browser2.filters.html import Attr, Link
+from weboob.browser.pages import HTMLPage, pagination
+from weboob.browser.elements import ItemElement, ListElement, method
+from weboob.browser.filters.standard import CleanText, Regexp, CleanDecimal, Env, DateTime, BrowserURL
+from weboob.browser.filters.html import Attr, Link
 from weboob.capabilities.housing import City, Housing, HousingPhoto
+from weboob.capabilities.base import NotAvailable
 from datetime import date, timedelta
 from weboob.tools.date import DATE_TRANSLATE_FR, LinearDateGuesser
 
@@ -46,7 +47,7 @@ class HousingListPage(HTMLPage):
         return self.find_select_value(asked_area, '//select[@id="sqe"]/option')
 
     def get_rooms_min(self, asked_rooms):
-        return self.find_select_value(asked_rooms, '//select[@id="ros"]/option')
+        return self.find_select_value(asked_rooms, '//select[@id="rooms_ros"]/option')
 
     # def get_rooms_max(self, asked_rooms):
     #     return self.find_select_value(asked_rooms, '//select[@id="roe"]/option')
@@ -77,7 +78,7 @@ class HousingListPage(HTMLPage):
         item_xpath = '//div[@class="list-lbc"]/a'
 
         def next_page(self):
-            return Link('//li[@class="page"]/a')(self)
+            return Link('//li[@class="page"]/a[contains(text(),"Page suivante")]')(self)
 
         class item(ItemElement):
             klass = Housing
@@ -93,8 +94,8 @@ class HousingListPage(HTMLPage):
 
             def obj_date(self):
                 _date = CleanText('./div[@class="lbc"]/div[@class="date"]',
-                                  replace=[('Aujourd\'hui', str(date.today().day)),
-                                           ('Hier', str((date.today() - timedelta(1)).day))])(self)
+                                  replace=[('Aujourd\'hui', str(date.today())),
+                                           ('Hier', str((date.today() - timedelta(1))))])(self)
                 for fr, en in DATE_TRANSLATE_FR:
                     _date = fr.sub(en, _date)
 
@@ -116,12 +117,14 @@ class HousingPage(HTMLPage):
 
         def parse(self, el):
             details = dict()
+            self.env['location'] = NotAvailable
             for tr in el.xpath('//div[@class="floatLeft"]/table/tr'):
                 if 'Ville' in CleanText('./th')(tr):
                     self.env['location'] = CleanText('./td')(tr)
                 else:
                     details['%s' % CleanText('./th', replace=[(':', '')])(tr)] = CleanText('./td')(tr)
 
+            self.env['area'] = NotAvailable
             for tr in el.xpath('//div[@class="lbcParams criterias"]/table/tr'):
                 if 'Surface' in CleanText('./th')(tr):
                     self.env['area'] = CleanDecimal(Regexp(CleanText('./td'), '(.*)m.*'),
@@ -145,6 +148,7 @@ class HousingPage(HTMLPage):
         obj_location = Env('location')
         obj_details = Env('details')
         obj_area = Env('area')
+        obj_url = BrowserURL('housing', _id=Env('_id'))
 
         def obj_date(self):
             _date = Regexp(CleanText('//div[@class="upload_by"]', replace=[(u'à', '')]),

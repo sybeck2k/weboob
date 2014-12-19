@@ -58,6 +58,7 @@ class HistoryFormatter(IFormatter):
                                 self.colored('%-17s' % (obj.location or ''), 'magenta'),
                                 self.colored(obj.activity or '', 'yellow'))
 
+
 class StatusFormatter(IFormatter):
     MANDATORY_FIELDS = ('id',)
 
@@ -83,8 +84,8 @@ class StatusFormatter(IFormatter):
 
 class Parceloob(ReplApplication):
     APPNAME = 'parceloob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2013 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2013-YEAR Romain Bignon'
     CAPS = CapParcel
     DESCRIPTION = "Console application to track your parcels."
     SHORT_DESCRIPTION = "manage your parcels"

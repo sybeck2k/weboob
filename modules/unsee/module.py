@@ -22,6 +22,7 @@ from weboob.tools.backend import Module
 from weboob.capabilities.paste import BasePaste
 from weboob.tools.capabilities.paste import BasePasteModule
 from weboob.tools.capabilities.paste import image_mime
+from weboob.deprecated.browser.decorators import check_url
 import re
 
 from .browser import UnseeBrowser
@@ -42,7 +43,7 @@ class UnseeModule(Module, BasePasteModule):
     MAINTAINER = u'Vincent A'
     EMAIL = 'dev@indigo.re'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
 
     BROWSER = UnseeBrowser
 
@@ -57,6 +58,7 @@ class UnseeModule(Module, BasePasteModule):
             mime = image_mime(contents, ('gif', 'jpeg', 'png'))
             return 20 * int(mime is not None)
 
+    @check_url('https?://unsee.cc/.+')
     def get_paste(self, id):
         paste = UnPaste(id)
         paste.contents = self.browser.get_image(id).encode('base64')
@@ -74,4 +76,3 @@ class UnseeModule(Module, BasePasteModule):
         d = self.browser.post_image(paste.title, paste.contents.decode('base64'), max_code)
         paste.id = d['id']
         return paste
-

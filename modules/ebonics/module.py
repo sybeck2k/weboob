@@ -22,7 +22,7 @@ import urllib
 
 from weboob.capabilities.translate import CapTranslate, Translation, TranslationFail, LanguageNotSupported
 from weboob.tools.backend import Module
-from weboob.tools.browser import StandardBrowser
+from weboob.deprecated.browser import StandardBrowser
 
 
 __all__ = ['EbonicsModule']
@@ -32,7 +32,7 @@ class EbonicsModule(Module, CapTranslate):
     NAME = 'ebonics'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u'English to Ebonics translation service'
     BROWSER = StandardBrowser

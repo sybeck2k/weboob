@@ -18,15 +18,13 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.content import CapContent, Content
 from weboob.capabilities.bugtracker import CapBugTracker, Issue, Project, User, \
                                            Version, Status, Update, Attachment, \
                                            Query, Change
 from weboob.capabilities.collection import CapCollection, Collection, CollectionNotFound
 from weboob.tools.backend import Module, BackendConfig
-from weboob.core.exceptions import BrowserHTTPNotFound
+from weboob.exceptions import BrowserHTTPNotFound
 from weboob.tools.value import ValueBackendPassword, Value
 
 from .browser import RedmineBrowser
@@ -39,7 +37,7 @@ class RedmineModule(Module, CapContent, CapBugTracker, CapCollection):
     NAME = 'redmine'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'The Redmine project management web application'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(Value('url',      label='URL of the Redmine website', regexp=r'https?://.*'),

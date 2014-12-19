@@ -18,8 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.messages import CantSendMessage, CapMessages, CapMessagesPost
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword, Value
@@ -34,7 +32,7 @@ class BouyguesModule(Module, CapMessages, CapMessagesPost):
     NAME = 'bouygues'
     MAINTAINER = u'Christophe Benz'
     EMAIL = 'christophe.benz@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Bouygues Télécom French mobile phone provider'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(Value('login', label='Login'),

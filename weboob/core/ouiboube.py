@@ -23,7 +23,7 @@ import os
 from weboob.core.bcall import BackendsCall
 from weboob.core.modules import ModulesLoader, RepositoryModulesLoader, ModuleLoadError
 from weboob.core.backendscfg import BackendsConfig
-from weboob.core.repositories import Repositories, IProgress
+from weboob.core.repositories import Repositories, PrintProgress
 from weboob.core.scheduler import Scheduler
 from weboob.tools.backend import Module
 from weboob.tools.config.iconfig import ConfigError
@@ -51,7 +51,7 @@ class WebNip(object):
     :param scheduler: what scheduler to use; default is :class:`weboob.core.scheduler.Scheduler`
     :type scheduler: :class:`weboob.core.scheduler.IScheduler`
     """
-    VERSION = '1.0'
+    VERSION = '1.1'
 
     def __init__(self, modules_path=None, storage=None, scheduler=None):
         self.logger = getLogger('weboob')
@@ -111,6 +111,7 @@ class WebNip(object):
         :param backend_name: name of backend we can't load
         :param exception: exception object
         """
+
         def __init__(self, backend_name, exception):
             Exception.__init__(self, unicode(exception))
             self.backend_name = backend_name
@@ -160,6 +161,12 @@ class WebNip(object):
 
         return unloaded
 
+    def __getitem__(self, name):
+        """
+        Alias for :func:`WebNip.get_backend`.
+        """
+        return self.get_backend(name)
+
     def get_backend(self, name, **kwargs):
         """
         Get a backend from its name.
@@ -184,7 +191,7 @@ class WebNip(object):
         """
         return len(self.backend_instances)
 
-    def iter_backends(self, caps=None):
+    def iter_backends(self, caps=None, module=None):
         """
         Iter on each backends.
 
@@ -192,10 +199,13 @@ class WebNip(object):
 
         :param caps: optional list of capabilities to select backends
         :type caps: tuple[:class:`weboob.capabilities.base.Capability`]
+        :param module: optional name of module
+        :type module: :class:`basestring`
         :rtype: iter[:class:`weboob.tools.backend.Module`]
         """
         for _, backend in sorted(self.backend_instances.iteritems()):
-            if caps is None or backend.has_caps(caps):
+            if (caps is None or backend.has_caps(caps)) and \
+               (module is None or backend.NAME == module):
                 with backend:
                     yield backend
 
@@ -353,7 +363,7 @@ class Weboob(WebNip):
         elif not os.path.isdir(name):
             self.logger.error(u'"%s" is not a directory', name)
 
-    def update(self, progress=IProgress()):
+    def update(self, progress=PrintProgress()):
         """
         Update modules from repositories.
         """

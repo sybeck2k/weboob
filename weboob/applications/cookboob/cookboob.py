@@ -74,8 +74,8 @@ class RecipeListFormatter(PrettyFormatter):
 
 class Cookboob(ReplApplication):
     APPNAME = 'cookboob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2013 Julien Veyssier'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2013-YEAR Julien Veyssier'
     DESCRIPTION = "Console application allowing to search for recipes on various websites."
     SHORT_DESCRIPTION = "search and consult recipes"
     CAPS = CapRecipe
@@ -155,5 +155,5 @@ class Cookboob(ReplApplication):
         """
         self.change_path([u'search'])
         self.start_format(pattern=pattern)
-        for backend, recipe in self.do('iter_recipes', pattern=pattern):
+        for recipe in self.do('iter_recipes', pattern=pattern):
             self.cached_format(recipe)

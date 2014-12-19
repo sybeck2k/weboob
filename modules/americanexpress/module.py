@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.bank import CapBank, AccountNotFound
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword
@@ -33,7 +32,7 @@ class AmericanExpressModule(Module, CapBank):
     NAME = 'americanexpress'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'American Express'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(ValueBackendPassword('login',    label='Code utilisateur', masked=False),
@@ -63,4 +62,3 @@ class AmericanExpressModule(Module, CapBank):
             transactions = list(self.browser.get_history(account))
             transactions.sort(key=lambda tr: tr.rdate, reverse=True)
             return transactions
-

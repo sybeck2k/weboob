@@ -18,8 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.newsfeed import Newsfeed
 from weboob.tools.value import Value, ValueInt, ValueBackendPassword
@@ -37,7 +35,7 @@ class PhpBBModule(Module, CapMessages, CapMessagesPost):
     NAME = 'phpbb'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = "phpBB forum"
     CONFIG = BackendConfig(Value('url',                     label='URL of forum', regexp='https?://.*'),

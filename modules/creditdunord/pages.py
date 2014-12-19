@@ -23,7 +23,7 @@ from decimal import Decimal
 import re
 from cStringIO import StringIO
 
-from weboob.tools.browser import Page, BrokenPageError
+from weboob.deprecated.browser import Page, BrokenPageError
 from weboob.tools.json import json
 from weboob.capabilities.bank import Account
 from weboob.capabilities import NotAvailable
@@ -296,7 +296,7 @@ class ProTransactionsPage(TransactionsPage):
 
             for i, key, value in re.findall('listeopecv\[(\d+)\]\[\'(\w+)\'\]="(.*)";', txt):
                 i = int(i)
-                if not i in transactions:
+                if i not in transactions:
                     transactions[i] = {}
                 transactions[i][key] = value
 

@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.bank import CapBank, AccountNotFound
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.ordereddict import OrderedDict
@@ -34,7 +33,7 @@ class CreditDuNordModule(Module, CapBank):
     NAME = 'creditdunord'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Crédit du Nord, Banque Courtois, Kolb, Tarneaud'
     LICENSE = 'AGPLv3+'
     website_choices = OrderedDict([(k, u'%s (%s)' % (v, k)) for k, v in sorted({
@@ -43,7 +42,7 @@ class CreditDuNordModule(Module, CapBank):
         'www.banque-kolb.fr':        u'Banque Kolb',
         'www.banque-rhone-alpes.fr': u'Banque Rhône-Alpes',
         'www.tarneaud.fr':           u'Tarneaud',
-        }.iteritems(), key=lambda (k, v): (v, k))])
+        }.iteritems(), key=lambda k_v: (k_v[1], k_v[0]))])
     CONFIG = BackendConfig(Value('website',  label='Banque', choices=website_choices, default='www.credit-du-nord.fr'),
                            ValueBackendPassword('login',    label='Identifiant', masked=False),
                            ValueBackendPassword('password', label='Code confidentiel'))

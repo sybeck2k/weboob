@@ -20,7 +20,7 @@
 
 from weboob.capabilities.cinema import Person, Movie
 from weboob.capabilities.base import NotAvailable, NotLoaded
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 from weboob.tools.html import html2text
 from datetime import datetime
 import re
@@ -29,6 +29,7 @@ import re
 class ReleasePage(Page):
     ''' Page containing releases of a movie
     '''
+
     def get_movie_releases(self, country_filter):
         result = unicode()
         links = self.parser.select(self.document.getroot(), 'table#release_dates a')
@@ -57,6 +58,7 @@ class ReleasePage(Page):
 class BiographyPage(Page):
     ''' Page containing biography of a person
     '''
+
     def get_biography(self):
         bio = unicode()
         start = False
@@ -74,6 +76,7 @@ class BiographyPage(Page):
 class MovieCrewPage(Page):
     ''' Page listing all the persons related to a movie
     '''
+
     def iter_persons(self, role_filter=None):
         if (role_filter is None or (role_filter is not None and role_filter == 'actor')):
             tables = self.parser.select(self.document.getroot(), 'table.cast_list')
@@ -114,7 +117,7 @@ class MovieCrewPage(Page):
                         person = Person(id, name)
                         person.short_description = role_detail
                         yield person
-                            # yield self.browser.get_person(id)
+                        # yield self.browser.get_person(id)
 
     def iter_persons_ids(self):
         tables = self.parser.select(self.document.getroot(), 'table.cast_list')
@@ -130,6 +133,7 @@ class PersonPage(Page):
     ''' Page informing about a person
     It is used to build a Person instance and to get the movie list related to a person
     '''
+
     def get_person(self, id):
         name = NotAvailable
         short_biography = NotAvailable

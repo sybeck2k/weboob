@@ -20,9 +20,9 @@
 
 from weboob.capabilities.bank import CapBank, Account
 from weboob.tools.backend import Module, BackendConfig
-from weboob.tools.value import ValueBackendPassword
+from weboob.tools.value import ValueBackendPassword, Value
 
-from .browser import BPBrowser
+from .browser import BPBrowser, BProBrowser
 
 
 __all__ = ['BPModule']
@@ -32,14 +32,18 @@ class BPModule(Module, CapBank):
     NAME = 'bp'
     MAINTAINER = u'Nicolas Duhamel'
     EMAIL = 'nicolas@jombi.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u'La Banque Postale'
     CONFIG = BackendConfig(ValueBackendPassword('login',    label='Identifiant', masked=False),
-                           ValueBackendPassword('password', label='Mot de passe', regexp='^(\d{6}|)$'))
-    BROWSER = BPBrowser
+                           ValueBackendPassword('password', label='Mot de passe', regexp='^(\d{6}|)$'),
+                           Value('website', label='Type de compte', default='par',
+                                 choices={'par': 'Particuliers', 'pro': 'Professionnels'}))
 
     def create_default_browser(self):
+        b = {'par': BPBrowser, 'pro': BProBrowser}
+        self.BROWSER = b[self.config['website'].get()]
+
         return self.create_browser(self.config['login'].get(), self.config['password'].get())
 
     def iter_accounts(self):

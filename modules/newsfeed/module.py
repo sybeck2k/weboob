@@ -31,7 +31,7 @@ class NewsfeedModule(Module, CapMessages):
     NAME = 'newsfeed'
     MAINTAINER = u'Clément Schreiner'
     EMAIL = "clemux@clemux.info"
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = "Loads RSS and Atom feeds from any website"
     LICENSE = "AGPLv3+"
     CONFIG = BackendConfig(Value('url', label="Atom/RSS feed's url", regexp='https?://.*'))
@@ -54,7 +54,7 @@ class NewsfeedModule(Module, CapMessages):
             return None
 
         flags = Message.IS_HTML
-        if not thread.id in self.storage.get('seen', default=[]):
+        if thread.id not in self.storage.get('seen', default=[]):
             flags |= Message.IS_UNREAD
         if len(entry.content) > 0:
             content = u"<p>Link %s</p> %s" % (entry.link, entry.content[0])

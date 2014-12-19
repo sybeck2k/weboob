@@ -47,8 +47,8 @@ class XmlTranslationFormatter(IFormatter):
 
 class Translaboob(ReplApplication):
     APPNAME = 'translaboob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2012 Lucien Loiseau'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2012-YEAR Lucien Loiseau'
     DESCRIPTION = "Console application to translate text from one language to another"
     SHORT_DESCRIPTION = "translate text from one language to another"
     CAPS = CapTranslate
@@ -103,16 +103,16 @@ class Translaboob(ReplApplication):
         lan_from, lan_to, text = self.parse_command_args(line, 3, 2)
 
         try:
-            if not lan_from in self.LANGUAGE.keys():
+            if lan_from not in self.LANGUAGE.keys():
                 raise LanguageNotSupported()
-            if not lan_to in self.LANGUAGE.keys():
+            if lan_to not in self.LANGUAGE.keys():
                 raise LanguageNotSupported()
 
             if not text or text == '-':
                 text = self.acquire_input()
 
             self.start_format(source=text)
-            for backend, translation in self.do('translate', self.LANGUAGE[lan_from], self.LANGUAGE[lan_to], text):
+            for translation in self.do('translate', self.LANGUAGE[lan_from], self.LANGUAGE[lan_to], text):
                 self.format(translation)
         except (TranslationFail, LanguageNotSupported) as error:
             print(error, file=self.stderr)

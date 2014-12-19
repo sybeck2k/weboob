@@ -24,7 +24,7 @@ from decimal import Decimal
 import re
 from dateutil.relativedelta import relativedelta
 
-from weboob.tools.browser import Page, BrowserIncorrectPassword, BrokenPageError
+from weboob.deprecated.browser import Page, BrowserIncorrectPassword, BrokenPageError
 from weboob.tools.ordereddict import OrderedDict
 from weboob.capabilities.bank import Account
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
@@ -47,9 +47,11 @@ class ChangePasswordPage(Page):
     def on_loaded(self):
         raise BrowserIncorrectPassword('Please change your password')
 
+
 class VerifCodePage(Page):
     def on_loaded(self):
         raise BrowserIncorrectPassword('Unable to login: website asks a code from a card')
+
 
 class InfoPage(Page):
     pass
@@ -91,7 +93,7 @@ class AccountsPage(Page):
 
                 url = urlparse(link)
                 p = parse_qs(url.query)
-                if not 'rib' in p:
+                if 'rib' not in p:
                     continue
 
                 for i in (2,1):
@@ -167,7 +169,7 @@ class Transaction(FrenchTransaction):
 
 class OperationsPage(Page):
     def get_history(self):
-        index = 0
+        seen = set()
         for tr in self.document.getiterator('tr'):
             # columns can be:
             # - date | value | operation | debit | credit | contre-valeur
@@ -182,8 +184,7 @@ class OperationsPage(Page):
             if tds[0].attrib.get('class', '') == 'i g' or \
                tds[0].attrib.get('class', '') == 'p g' or \
                tds[0].attrib.get('class', '').endswith('_c1 c _c1'):
-                operation = Transaction(index)
-                index += 1
+                operation = Transaction(0)
 
                 parts = [txt.strip() for txt in tds[-3].itertext() if len(txt.strip()) > 0]
 
@@ -201,6 +202,7 @@ class OperationsPage(Page):
                 credit = self.parser.tocleanstring(tds[-1])
                 debit = self.parser.tocleanstring(tds[-2])
                 operation.set_amount(credit, debit)
+                operation.id = operation.unique_id(seen)
                 yield operation
 
     def go_next(self):
@@ -302,6 +304,7 @@ class CardPage(OperationsPage):
                 # because there is a span.aide.
                 tr.set_amount(tds[-1].text)
                 yield tr
+
 
 class NoOperationsPage(OperationsPage):
     def get_history(self):

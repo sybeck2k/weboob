@@ -18,8 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.messages import CantSendMessage, CapMessages, CapMessagesPost
 from weboob.capabilities.account import CapAccount, StatusField
 from weboob.tools.backend import Module, BackendConfig
@@ -35,7 +33,7 @@ class SfrModule(Module, CapAccount, CapMessages, CapMessagesPost):
     NAME = 'sfr'
     MAINTAINER = u'Christophe Benz'
     EMAIL = 'christophe.benz@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'SFR French mobile phone provider'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(Value('login', label='Login'),

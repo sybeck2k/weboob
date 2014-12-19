@@ -22,7 +22,7 @@ from decimal import Decimal
 import re
 
 from weboob.capabilities.bank import Account
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
 
 
@@ -93,6 +93,7 @@ class OperationsPage(Page):
         next_button = self.document.xpath(self._NEXT_XPATH)
         if next_button:
             return next_button[0]
+
 
 class LCRPage(OperationsPage):
     def iter_history(self):

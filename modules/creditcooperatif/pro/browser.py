@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from weboob.tools.browser import Browser, BrowserIncorrectPassword
+from weboob.deprecated.browser import Browser, BrowserIncorrectPassword
 
 from .pages import LoginPage, AccountsPage, ITransactionsPage, TransactionsPage, ComingTransactionsPage, CardTransactionsPage
 
@@ -75,15 +75,6 @@ class CreditCooperatif(Browser):
         self.location(self.buildurl('/banque/cpt/incoopanetj2ee.do?ssomode=ok'))
 
         return self.page.get_list()
-
-    def get_account(self, id):
-        assert isinstance(id, basestring)
-
-        for a in self.get_accounts_list():
-            if a.id == id:
-                return a
-
-        return None
 
     def _get_history(self, link):
         self.location(link)

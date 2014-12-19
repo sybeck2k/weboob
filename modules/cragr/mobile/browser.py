@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.tools.browser import Browser, BrowserIncorrectPassword
+from weboob.deprecated.browser import Browser, BrowserIncorrectPassword
 from weboob.tools.date import LinearDateGuesser
 from weboob.capabilities.bank import Transfer, TransferError
 from .pages import LoginPage, AccountsList
@@ -208,11 +208,11 @@ class CragrMobile(Browser):
         target_accounts = self.page.get_transfer_target_accounts()
 
         # check that the given source account can be used
-        if not account in source_accounts.values():
+        if account not in source_accounts.values():
             raise TransferError('You cannot use account %s as a source account.' % account)
 
         # check that the given source account can be used
-        if not to in target_accounts.values():
+        if to not in target_accounts.values():
             raise TransferError('You cannot use account %s as a target account.' % to)
 
         # separate euros from cents

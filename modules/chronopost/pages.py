@@ -23,7 +23,7 @@ from dateutil.parser import parse as parse_date
 
 from weboob.capabilities.parcel import Parcel, Event
 from weboob.capabilities import NotAvailable
-from weboob.tools.browser import Page
+from weboob.deprecated.browser import Page
 
 
 class IndexPage(Page):
@@ -31,6 +31,7 @@ class IndexPage(Page):
         self.browser.select_form(predicate=lambda form: form.attrs.get('id', '') == 'suivreEnvoi')
         self.browser['chronoNumbers'] = _id.encode('utf-8')
         self.browser.submit()
+
 
 class TrackPage(Page):
     def get_info(self, id):

@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.browser2 import PagesBrowser, URL
+from weboob.browser import PagesBrowser, URL
 
 from .pages import EventListPage, EventPage
 
@@ -27,8 +27,8 @@ __all__ = ['RazibusBrowser']
 
 
 class RazibusBrowser(PagesBrowser):
-    BASEURL = 'http://razibus.net/'
-    TIMEOUT = 15
+    BASEURL = 'http://razibus.net'
+    TIMEOUT = 20
     event_list_page = URL('evenements-a-venir.php\?region=(?P<region>.*)', EventListPage)
     event_page = URL('(?P<_id>.*).html', EventPage)
     region = None

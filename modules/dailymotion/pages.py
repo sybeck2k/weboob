@@ -27,7 +27,7 @@ import mechanize
 from weboob.capabilities import NotAvailable
 from weboob.capabilities.image import BaseImage
 from weboob.tools.html import html2text
-from weboob.tools.browser import Page, BrokenPageError
+from weboob.deprecated.browser import Page, BrokenPageError
 
 
 from .video import DailymotionVideo
@@ -36,7 +36,7 @@ from .video import DailymotionVideo
 class IndexPage(Page):
     def iter_videos(self):
         for div in self.parser.select(self.document.getroot(), 'div.sd_video_listitem'):
-            smalldiv = self.parser.select(div, 'div.sd_video_previewtwig', 1)
+            smalldiv = self.parser.select(div, 'div.sd_video_preview', 1)
             _id = smalldiv.attrib.get('data-id', None)
 
             if _id is None:
@@ -153,6 +153,7 @@ class VideoPage(Page):
             raise BrokenPageError(u'Unable to extract video URL')
 
         video.url = unicode(info[max_quality])
+
 
 class KidsVideoPage(VideoPage):
 

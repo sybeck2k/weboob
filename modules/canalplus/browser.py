@@ -22,8 +22,8 @@ import urllib
 
 import lxml.etree
 
-from weboob.tools.browser import Browser
-from weboob.tools.browser.decorators import id2url
+from weboob.deprecated.browser import Browser
+from weboob.deprecated.browser.decorators import id2url
 
 from .pages import ChannelsPage, VideoPage
 from .video import CanalplusVideo
@@ -95,7 +95,7 @@ class CanalplusBrowser(Browser):
         elif len(split_path) == 1:
             for channel in channels:
                 if channel.path_level == 2 and split_path == channel.parent_path:
-                        yield channel
+                    yield channel
         elif len(split_path) == 2:
             subchannels = self.iter_resources(split_path[0:1])
             try:

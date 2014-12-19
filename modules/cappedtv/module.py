@@ -9,7 +9,6 @@
 # http://sam.zoy.org/wtfpl/COPYING for more details.
 
 
-
 from weboob.capabilities.video import CapVideo, BaseVideo
 from weboob.capabilities.collection import CapCollection, CollectionNotFound
 from weboob.tools.backend import Module
@@ -23,7 +22,7 @@ class CappedModule(Module, CapVideo, CapCollection):
     NAME = 'cappedtv'
     MAINTAINER = u'Lord'
     EMAIL = 'lord@lordtoniok.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'Capped.tv demoscene website'
     LICENSE = 'WTFPLv2'
     BROWSER = CappedBrowser

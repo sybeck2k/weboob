@@ -18,15 +18,15 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.tools.mech import ClientForm
+from weboob.deprecated.mech import ClientForm
 ControlNotFoundError = ClientForm.ControlNotFoundError
 
 from decimal import Decimal
 import re
 
-from weboob.tools.mech import ClientForm
+from weboob.deprecated.mech import ClientForm
 from weboob.tools.ordereddict import OrderedDict
-from weboob.tools.browser import Page, BrokenPageError, BrowserUnavailable, BrowserIncorrectPassword
+from weboob.deprecated.browser import Page, BrokenPageError, BrowserUnavailable, BrowserIncorrectPassword
 from weboob.capabilities import NotAvailable
 from weboob.capabilities.bank import Account
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
@@ -38,6 +38,7 @@ class _LogoutPage(Page):
             raise BrowserIncorrectPassword(self.parser.tocleanstring(self.parser.select(self.document.getroot(), '.messErreur', 1)))
         except BrokenPageError:
             pass
+
 
 class LoginPage(_LogoutPage):
     def login(self, login):
@@ -82,6 +83,7 @@ class LoginPage(_LogoutPage):
 
 class ErrorPage(_LogoutPage):
     pass
+
 
 class UnavailablePage(Page):
     def on_loaded(self):

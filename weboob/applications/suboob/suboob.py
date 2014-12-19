@@ -85,8 +85,8 @@ class SubtitleListFormatter(PrettyFormatter):
 
 class Suboob(ReplApplication):
     APPNAME = 'suboob'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2013 Julien Veyssier'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2013-YEAR Julien Veyssier'
     DESCRIPTION = "Console application allowing to search for subtitles on various services " \
                   "and download them."
     SHORT_DESCRIPTION = "search and download subtitles"
@@ -146,7 +146,7 @@ class Suboob(ReplApplication):
                 ext = 'zip'
             dest = '%s.%s' % (subtitle.name, ext)
 
-        for backend, buf in self.do('get_subtitle_file', subtitle.id, backends=subtitle.backend):
+        for buf in self.do('get_subtitle_file', subtitle.id, backends=subtitle.backend):
             if buf:
                 if dest == '-':
                     self.stdout.write(buf)
@@ -194,5 +194,5 @@ class Suboob(ReplApplication):
             pattern = None
 
         self.start_format(pattern=pattern)
-        for backend, subtitle in self.do('iter_subtitles', language=language, pattern=pattern):
+        for subtitle in self.do('iter_subtitles', language=language, pattern=pattern):
             self.cached_format(subtitle)

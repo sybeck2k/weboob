@@ -32,7 +32,7 @@ class WellsFargoModule(Module, CapBank):
     NAME = 'wellsfargo'
     MAINTAINER = u'Oleg Plakhotniuk'
     EMAIL = 'olegus8@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u'Wells Fargo'
     CONFIG = BackendConfig(ValueBackendPassword('login',      label='Username', masked=False),
@@ -44,7 +44,7 @@ class WellsFargoModule(Module, CapBank):
                                    self.config['password'].get())
 
     def iter_accounts(self):
-        return self.browser.get_accounts()
+        return self.browser.iter_accounts()
 
     def get_account(self, id_):
         return self.browser.get_account(id_)

@@ -25,10 +25,10 @@ import requests
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
 from weboob.tools.captcha.virtkeyboard import MappedVirtKeyboard, VirtKeyboardError
 
-from weboob.browser2.page import HTMLPage, method, LoggedPage, pagination
-from weboob.browser2.elements import ListElement, ItemElement
-from weboob.browser2.filters.standard import Env, CleanDecimal
-from weboob.core.exceptions import ParseError
+from weboob.browser.pages import HTMLPage, LoggedPage, pagination
+from weboob.browser.elements import ListElement, ItemElement, method
+from weboob.browser.filters.standard import Env, CleanDecimal
+from weboob.exceptions import ParseError
 
 
 class Transaction(FrenchTransaction):
@@ -53,7 +53,7 @@ class VirtKeyboard(MappedVirtKeyboard):
              '5':('5ef102b78f5dc642ee98e9bdcf42a02e','496418730424d7f40d2b137d56bcbfe8','139186da206acf5344362ed86da42a7f',
                   'e080cd4fbda1493034f1444eae484887',),
              '6':('ab1fff097099fb395fe73470f7afcae0','70c64ac427435d40d2713128e8735b4d','bbb6fc3d0f23fa5104e2ea602ecc2d18',
-                  '5d8c50960dd1f50457697fd8a8d5622e',),
+                  '5d8c50960dd1f50457697fd8a8d5622e','96106ac2caa33e2a9025efcb21277a3c'),
              '7':('30f11190e1772dd0f93740190aaa7608','ef5477640cf97de373e49e13caef8f5c','05dfb006e2668d7dfd210b2fdf74fef8',
                   '8efb472abef04ac9bcd1ba02b49ed6a5',),
              '8':('8a8258f63f816888b550d704f4c6a068','69cade726c4d6c8e6a72e96df059c8c7','675972437c7733747146a0851bbb5727',
@@ -97,6 +97,7 @@ class VirtKeyboard(MappedVirtKeyboard):
             code += self.get_symbol_code(self.symbols[c])
         return code
 
+
 class LoginPage(HTMLPage):
     is_here ="//form[@id='formulaire-login']"
 
@@ -115,11 +116,13 @@ class LoginPage(HTMLPage):
         form['personneIdentifiee'] = 'N'
         form.submit()
 
+
 class IndexPage(LoggedPage, HTMLPage):
     is_here = "//div[@id='situation']"
 
     def get_balance(self):
-        return  -CleanDecimal('.', replace_dots=True)(self.doc.xpath('//div[@id = "total-sommes-dues"]/p[contains(text(), "sommes dues")]/span[@class = "montant"]')[0])
+        return -CleanDecimal('.', replace_dots=True)(self.doc.xpath('//div[@id = "total-sommes-dues"]/p[contains(text(), "sommes dues")]/span[@class = "montant"]')[0])
+
 
 class OperationsPage(LoggedPage, HTMLPage):
     is_here = "//div[@id='releve-reserve-credit'] | //div[@id='operations-recentes'] | //select[@id='periode']"

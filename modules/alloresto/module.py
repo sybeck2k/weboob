@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from weboob.capabilities.bank import CapBank, AccountNotFound
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword
@@ -33,7 +32,7 @@ class AlloRestoModule(Module, CapBank):
     NAME = 'alloresto'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = u'Allo Resto'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(ValueBackendPassword('login',    label='Identifiant', masked=False),
@@ -60,4 +59,3 @@ class AlloRestoModule(Module, CapBank):
 
     def iter_coming(self, account):
         return self.browser.get_coming(account)
-

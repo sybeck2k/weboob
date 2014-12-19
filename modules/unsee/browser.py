@@ -18,13 +18,13 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.tools.browser import Browser
+from weboob.deprecated.browser import Browser
 import os
 from uuid import uuid4
 from urllib2 import Request
 from urlparse import urljoin
 from weboob.tools.json import json
-from weboob.tools.parsers.lxmlparser import LxmlHtmlParser
+from weboob.deprecated.browser.parsers.lxmlparser import LxmlHtmlParser
 
 
 __all__ = ['UnseeBrowser']
@@ -35,6 +35,7 @@ def to_bytes(s):
         return s.encode('utf-8')
     else:
         return s
+
 
 class FileField(object):
     def __init__(self, filename, contents=None, headers=None):

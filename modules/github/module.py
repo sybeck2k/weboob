@@ -32,13 +32,14 @@ STATUSES = {'open': Status('open', u'Open', Status.VALUE_NEW),
             'closed': Status('closed', u'closed', Status.VALUE_RESOLVED)}
 # TODO tentatively parse github "labels"?
 
+
 class GithubModule(Module, CapBugTracker):
     NAME = 'github'
     DESCRIPTION = u'GitHub issues tracking'
     MAINTAINER = u'Vincent A'
     EMAIL = 'dev@indigo.re'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
     CONFIG = BackendConfig(Value('username', label='Username', default=''),
                            ValueBackendPassword('password', label='Password', default=''))
 

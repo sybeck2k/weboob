@@ -22,15 +22,14 @@ from weboob.capabilities.bank import Account, Transaction
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword
 from weboob.capabilities.base import NotAvailable
-from weboob.core.exceptions import BrowserIncorrectPassword, ParseError
-from weboob.browser2 import Browser
+from weboob.exceptions import BrowserIncorrectPassword, BrowserHTTPError, ParseError
+from weboob.browser import Browser
 
 from re import match, compile, sub
 from decimal import Decimal
 from lxml import etree
 from datetime import date
 from StringIO import StringIO
-
 
 
 __all__ = ['CmbModule']
@@ -40,7 +39,7 @@ class CmbModule(Module, CapBank):
     NAME = 'cmb'
     MAINTAINER = u'Johann Broudin'
     EMAIL = 'Johann.Broudin@6-8.fr'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u'Crédit Mutuel de Bretagne'
     CONFIG = BackendConfig(
@@ -96,14 +95,12 @@ class CmbModule(Module, CapBank):
             'motDePasse': self.config['password'].get()
             }
 
-        response = self.browser.open("https://www.cmb.fr/domiweb/servlet/Identification", allow_redirects=False, data=data)
-
-        if response.status_code == 302:
-          self.islogged=True
-          return True
-        else:
+        try:
+            self.browser.open("https://www.cmb.fr/domiweb/servlet/Identification", allow_redirects=False, data=data)
+        except BrowserHTTPError:
             raise BrowserIncorrectPassword()
-        return False
+        else:
+            self.islogged=True
 
     def iter_accounts(self):
         if not self.islogged:

@@ -56,8 +56,8 @@ class LyricsListFormatter(PrettyFormatter):
 
 class Booblyrics(ReplApplication):
     APPNAME = 'booblyrics'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2013 Julien Veyssier'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2013-YEAR Julien Veyssier'
     DESCRIPTION = "Console application allowing to search for song lyrics on various websites."
     SHORT_DESCRIPTION = "search and display song lyrics"
     CAPS = CapLyrics
@@ -107,5 +107,5 @@ class Booblyrics(ReplApplication):
             pattern = None
 
         self.start_format(pattern=pattern)
-        for backend, songlyrics in self.do('iter_lyrics', criteria, pattern):
+        for songlyrics in self.do('iter_lyrics', criteria, pattern):
             self.cached_format(songlyrics)

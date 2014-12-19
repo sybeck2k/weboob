@@ -24,6 +24,7 @@ from cmd import Cmd
 import logging
 import re
 from optparse import OptionGroup, OptionParser, IndentedHelpFormatter
+from datetime import datetime
 import os
 
 from weboob.capabilities.base import FieldNotFound, BaseObject, UserError
@@ -113,9 +114,10 @@ class ReplApplication(Cmd, ConsoleApplication):
         Cmd.__init__(self)
         ConsoleApplication.__init__(self, ReplOptionParser(self.SYNOPSIS, version=self._get_optparse_version()))
 
+        copyright = self.COPYRIGHT.replace('YEAR', '%d' % datetime.today().year).encode(self.encoding)
         self.intro = '\n'.join(('Welcome to %s%s%s v%s' % (self.BOLD, self.APPNAME, self.NC, self.VERSION),
                                 '',
-                                self.COPYRIGHT.encode(self.encoding),
+                                copyright,
                                 'This program is free software: you can redistribute it and/or modify',
                                 'it under the terms of the GNU Affero General Public License as published by',
                                 'the Free Software Foundation, either version 3 of the License, or',
@@ -204,10 +206,10 @@ class ReplApplication(Cmd, ConsoleApplication):
                 print('This command works with an unique backend. Availables:')
                 for index, (name, backend) in enumerate(e.backends):
                     print('%s%d)%s %s%-15s%s   %s' % (self.BOLD, index + 1, self.NC, self.BOLD, name, self.NC,
-                        backend.DESCRIPTION))
+                          backend.DESCRIPTION))
                 i = self.ask('Select a backend to proceed with "%s"' % id)
                 if not i.isdigit():
-                    if not i in dict(e.backends):
+                    if i not in dict(e.backends):
                         print('Error: %s is not a valid backend' % i, file=self.stderr)
                         continue
                     backend_name = i
@@ -261,7 +263,7 @@ class ReplApplication(Cmd, ConsoleApplication):
                 new_backend_names.append(backend)
         backend_names = tuple(new_backend_names)
         try:
-            for backend, objiter in self.do(method, _id, backends=backend_names, fields=fields, **kargs):
+            for objiter in self.do(method, _id, backends=backend_names, fields=fields, **kargs):
                 if objiter:
                     obj = objiter
                     if objiter.id == _id:
@@ -280,8 +282,8 @@ class ReplApplication(Cmd, ConsoleApplication):
             return self.objects
         elif method is not None:
             kwargs['backends'] = self.enabled_backends
-            for backend, object in self.weboob.do(self._do_complete, None, None, method, *args, **kwargs):
-                self.add_object(object)
+            for _object in self.weboob.do(self._do_complete, None, None, method, *args, **kwargs):
+                self.add_object(_object)
             return self.objects
         # XXX: what can we do without method?
         else:
@@ -462,11 +464,11 @@ class ReplApplication(Cmd, ConsoleApplication):
     def path_completer(self, arg):
         dirname = os.path.dirname(arg)
         try:
-            childs = os.listdir(dirname or '.')
+            children = os.listdir(dirname or '.')
         except OSError:
             return ()
         l = []
-        for child in childs:
+        for child in children:
             path = os.path.join(dirname, child)
             if os.path.isdir(path):
                 child += '/'
@@ -925,8 +927,8 @@ class ReplApplication(Cmd, ConsoleApplication):
                         self.commands_formatters = {}
                         self.DEFAULT_FORMATTER = self.set_formatter(args[0])
                 else:
-                    print('Formatter "%s" is not available.\n' \
-                            'Available formatters: %s.' % (args[0], ', '.join(self.formatters_loader.get_available_formatters())), file=self.stderr)
+                    print('Formatter "%s" is not available.\n'
+                          'Available formatters: %s.' % (args[0], ', '.join(self.formatters_loader.get_available_formatters())), file=self.stderr)
                     return 1
         else:
             print('Default formatter: %s' % self.DEFAULT_FORMATTER)
@@ -1069,9 +1071,9 @@ class ReplApplication(Cmd, ConsoleApplication):
 
             collections = []
             try:
-                for backend, res in self.do('get_collection', objs=self.COLLECTION_OBJECTS,
-                                            split_path=self.working_path.get(),
-                                            caps=CapCollection):
+                for res in self.do('get_collection', objs=self.COLLECTION_OBJECTS,
+                                   split_path=self.working_path.get(),
+                                   caps=CapCollection):
                     if res:
                         collections.append(res)
             except CallErrors as errors:
@@ -1092,9 +1094,9 @@ class ReplApplication(Cmd, ConsoleApplication):
         split_path = self.working_path.get()
 
         try:
-            for backend, res in self.do('iter_resources', objs=objs,
-                                                          split_path=split_path,
-                                                          caps=CapCollection):
+            for res in self.do('iter_resources', objs=objs,
+                                                 split_path=split_path,
+                                                 caps=CapCollection):
                 yield res
         except CallErrors as errors:
             self.bcall_errors_handler(errors, CollectionNotFound)

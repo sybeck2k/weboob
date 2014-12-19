@@ -18,8 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.tools.backend import Module
 from weboob.capabilities.messages import CapMessages, Message, Thread
 
@@ -33,7 +31,7 @@ class HDSModule(Module, CapMessages):
     NAME = 'hds'
     MAINTAINER = u'Romain Bignon'
     EMAIL = 'romain@weboob.org'
-    VERSION = '1.0'
+    VERSION = '1.1'
     LICENSE = 'AGPLv3+'
     DESCRIPTION = u"Histoires de Sexe French erotic novels"
     STORAGE = {'seen': []}
@@ -42,12 +40,11 @@ class HDSModule(Module, CapMessages):
     #### CapMessages ##############################################
 
     def iter_threads(self):
-        with self.browser:
-            for story in self.browser.iter_stories():
-                thread = Thread(story.id)
-                thread.title = story.title
-                thread.date = story.date
-                yield thread
+        for story in self.browser.iter_stories():
+            thread = Thread(story.id)
+            thread.title = story.title
+            thread.date = story.date
+            yield thread
 
     GENDERS = ['<unknown>', 'boy', 'girl', 'transexual']
 
@@ -58,8 +55,7 @@ class HDSModule(Module, CapMessages):
         else:
             thread = None
 
-        with self.browser:
-            story = self.browser.get_story(id)
+        story = self.browser.get_story(id)
 
         if not story:
             return None
@@ -68,7 +64,7 @@ class HDSModule(Module, CapMessages):
             thread = Thread(story.id)
 
         flags = 0
-        if not thread.id in self.storage.get('seen', default=[]):
+        if thread.id not in self.storage.get('seen', default=[]):
             flags |= Message.IS_UNREAD
 
         thread.title = story.title
@@ -82,7 +78,7 @@ class HDSModule(Module, CapMessages):
                               parent=None,
                               content=story.body,
                               children=[],
-                              signature='Written by a %s (%s)' % (self.GENDERS[story.author.sex], story.author.email),
+                              signature=u'Written by a %s in category %s' % (self.GENDERS[story.author.sex], story.category),
                               flags=flags)
 
         return thread

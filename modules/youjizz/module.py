@@ -18,8 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-
 from weboob.capabilities.video import CapVideo, BaseVideo
 from weboob.capabilities.collection import CapCollection, CollectionNotFound
 from weboob.tools.backend import Module
@@ -34,7 +32,7 @@ class YoujizzModule(Module, CapVideo, CapCollection):
     NAME = 'youjizz'
     MAINTAINER = u'Roger Philibert'
     EMAIL = 'roger.philibert@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'YouJizz pornographic video streaming website'
     LICENSE = 'AGPLv3+'
     BROWSER = YoujizzBrowser
@@ -53,7 +51,7 @@ class YoujizzModule(Module, CapVideo, CapCollection):
             # if we don't want only the thumbnail, we probably want also every fields
             video = self.browser.get_video(video.id, video)
         if 'thumbnail' in fields and video.thumbnail:
-            video.thumbnail.data = self.browser.readurl(video.thumbnail.url)
+            video.thumbnail.data = self.browser.open(video.thumbnail.url).content
 
         return video
 

@@ -48,8 +48,8 @@ class EventListFormatter(PrettyFormatter):
 
 class HaveDate(Boobmsg):
     APPNAME = 'havedate'
-    VERSION = '1.0'
-    COPYRIGHT = 'Copyright(C) 2010-2012 Romain Bignon'
+    VERSION = '1.1'
+    COPYRIGHT = 'Copyright(C) 2010-YEAR Romain Bignon'
     DESCRIPTION = "Console application allowing to interact with various dating websites " \
                   "and to optimize seduction algorithmically."
     SHORT_DESCRIPTION = "interact with dating websites"
@@ -87,7 +87,7 @@ class HaveDate(Boobmsg):
         """
         _id, backend_name = self.parse_id(id, unique_backend=True)
 
-        for backend, query in self.do('send_query', _id, backends=backend_name):
+        for query in self.do('send_query', _id, backends=backend_name):
             print('%s' % query.message)
 
     def edit_optims(self, backend_names, optims_names, stop=False):
@@ -97,9 +97,9 @@ class HaveDate(Boobmsg):
 
         for optim_name in optims_names.split():
             backends_optims = {}
-            for backend, optim in self.do('get_optimization', optim_name, backends=backend_names):
+            for optim in self.do('get_optimization', optim_name, backends=backend_names):
                 if optim:
-                    backends_optims[backend.name] = optim
+                    backends_optims[optim.backend] = optim
             for backend_name, optim in backends_optims.iteritems():
                 if len(optim.CONFIG) == 0:
                     print('%s.%s does not require configuration.' % (backend_name, optim_name))
@@ -132,7 +132,7 @@ class HaveDate(Boobmsg):
                 if store:
                     storage_optim = set(self.storage.get('optims', optim_name, default=[]))
                 self.stdout.write('%sing %s:' % (function.capitalize(), optim_name))
-                for backend, optim in self.do('get_optimization', optim_name, backends=backend_names):
+                for optim in self.do('get_optimization', optim_name, backends=backend_names):
                     if optim:
                         # It's useless to start a started optim, or to stop a stopped one.
                         if (function == 'start' and optim.is_running()) or \
@@ -141,19 +141,19 @@ class HaveDate(Boobmsg):
 
                         # Optim is not configured and would be, ask user to do it.
                         if function == 'start' and len(optim.CONFIG) > 0 and optim.get_config() is None:
-                            self.edit_optims(backend.name, optim_name)
+                            self.edit_optims(optim.backend, optim_name)
 
                         ret = getattr(optim, function)()
-                        self.stdout.write(' ' + backend.name)
+                        self.stdout.write(' ' + optim.backend)
                         if not ret:
                             self.stdout.write('(failed)')
                         self.stdout.flush()
                         if store:
                             if function == 'start' and ret:
-                                storage_optim.add(backend.name)
+                                storage_optim.add(optim.backend)
                             elif function == 'stop':
                                 try:
-                                    storage_optim.remove(backend.name)
+                                    storage_optim.remove(optim.backend)
                                 except KeyError:
                                     pass
                 self.stdout.write('.\n')
@@ -183,7 +183,7 @@ class HaveDate(Boobmsg):
             else:
                 backend = args[2]
             optims = set()
-            for backend, (name, optim) in self.do('iter_optimizations', backends=backend):
+            for (name, optim) in self.do('iter_optimizations', backends=backend):
                 optims.add(name)
             return sorted(optims - set(args[3:]))
 
@@ -205,7 +205,7 @@ class HaveDate(Boobmsg):
 
         if backend_name == '*':
             backend_name = None
-        elif backend_name is not None and not backend_name in [b.name for b in self.enabled_backends]:
+        elif backend_name is not None and backend_name not in [b.name for b in self.enabled_backends]:
             print('Error: No such backend "%s"' % backend_name, file=self.stderr)
             return 1
 
@@ -222,18 +222,18 @@ class HaveDate(Boobmsg):
 
             optims = {}
             backends = set()
-            for backend, (name, optim) in self.do('iter_optimizations', backends=backend_name):
-                if optims_names is not None and not name in optims_names:
+            for (name, optim) in self.do('iter_optimizations', backends=backend_name):
+                if optims_names is not None and name not in optims_names:
                     continue
                 if optim.is_running():
                     status = 'RUNNING'
                 else:
                     status = '-------'
-                if not name in optims:
-                    optims[name] = {backend.name: status}
+                if name not in optims:
+                    optims[name] = {optim.backend: status}
                 else:
-                    optims[name][backend.name] = status
-                backends.add(backend.name)
+                    optims[name][optim.backend] = status
+                backends.add(optim.backend)
 
             backends = sorted(backends)
             for name, backends_status in optims.iteritems():
@@ -257,5 +257,5 @@ class HaveDate(Boobmsg):
         """
         self.change_path([u'events'])
         self.start_format()
-        for backend, event in self.do('iter_events'):
+        for event in self.do('iter_events'):
             self.cached_format(event)

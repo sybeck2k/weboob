@@ -18,7 +18,6 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 import re
 from weboob.capabilities.gallery import CapGallery, BaseGallery
 from weboob.capabilities.collection import CapCollection, CollectionNotFound
@@ -37,7 +36,7 @@ class EHentaiModule(Module, CapGallery, CapCollection):
     NAME = 'ehentai'
     MAINTAINER = u'Roger Philibert'
     EMAIL = 'roger.philibert@gmail.com'
-    VERSION = '1.0'
+    VERSION = '1.1'
     DESCRIPTION = 'E-Hentai galleries'
     LICENSE = 'AGPLv3+'
     BROWSER = EHentaiBrowser

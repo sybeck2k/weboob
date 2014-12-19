@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
-from weboob.tools.browser import Browser
+from weboob.deprecated.browser import Browser
 from .pages import LivePage, StreamsPage
 
 __all__ = ['NectarineBrowser']
+
 
 class NectarineBrowser(Browser):
     DOMAIN = 'www.scenemusic.net'

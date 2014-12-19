@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from weboob.browser2 import PagesBrowser, URL
+from weboob.browser import PagesBrowser, URL
 
 from .pages import ProgramPage, EventPage
 
@@ -28,7 +28,7 @@ __all__ = ['BiplanBrowser']
 class BiplanBrowser(PagesBrowser):
     BASEURL = 'http://www.lebiplan.org'
 
-    program_page = URL('/fr/biplan-prog-(?P<_category>.*)', ProgramPage)
+    program_page = URL('/fr/biplan-prog-(?P<_category>.*).php', ProgramPage)
     event_page = URL('/(?P<_id>.*).html', EventPage)
 
     def list_events_concert(self, date_from, date_to=None, city=None, categories=None):
