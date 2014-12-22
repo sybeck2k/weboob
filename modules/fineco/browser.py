@@ -21,19 +21,19 @@
 from urlparse import urlsplit, parse_qsl, urlparse
 from datetime import datetime, timedelta
 
-from weboob.deprecated.browser import BaseBrowser, BrowserIncorrectPassword
+from weboob.deprecated.browser import Browser, BrowserIncorrectPassword
 from weboob.capabilities.bank import Transfer, TransferError
 
 from .pages import LoginPage, LoginErrorPage, AccountsPage, EmptyPage, OperationsPage
 
 
-class FinecoBrowser(BaseBrowser):
+class FinecoBrowser(Browser):
     BASEURL = 'https://nuovosito.fineco.it'
 
     PROTOCOL = 'https'
     DOMAIN = 'nuovosito.fineco.it'
     ENCODING = 'utf-8'
-    USER_AGENT = BaseBrowser.USER_AGENTS['wget']
+    USER_AGENT = Browser.USER_AGENTS['wget']
     PAGES = {'https://www.fineco.it/it/public':   LoginPage,
              'https://www.fineco.it/public/error': LoginErrorPage,
              'https://nuovosito.fineco.it/conto-e-carte': AccountsPage,

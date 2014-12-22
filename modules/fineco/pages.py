@@ -27,14 +27,14 @@ from datetime import datetime
 import datetime
 import hashlib
 
-from weboob.deprecated.browser import BasePage, BrowserIncorrectPassword, BrokenPageError
+from weboob.deprecated.browser import Page, BrowserIncorrectPassword, BrokenPageError
 from weboob.tools.ordereddict import OrderedDict
 from weboob.capabilities.bank import Account
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
 from weboob.tools.date import parse_french_date
 
 
-class LoginPage(BasePage):
+class LoginPage(Page):
     def login(self, login, passwd):
     	formcount=0
     	for frm in self.browser.forms():  
@@ -48,37 +48,36 @@ class LoginPage(BasePage):
         self.browser.submit(nologin=True)
 
 
-class LoginErrorPage(BasePage):
+class LoginErrorPage(Page):
     pass
 
-
-class ChangePasswordPage(BasePage):
+class ChangePasswordPage(Page):
     def on_loaded(self):
         raise BrowserIncorrectPassword('Please change your password')
 
-class VerifCodePage(BasePage):
+class VerifCodePage(Page):
     def on_loaded(self):
         raise BrowserIncorrectPassword('Unable to login: website asks a code from a card')
 
-class InfoPage(BasePage):
+class InfoPage(Page):
     pass
 
 
-class EmptyPage(BasePage):
+class EmptyPage(Page):
     pass
 
 
-class TransfertPage(BasePage):
+class TransfertPage(Page):
     pass
 
 
-class UserSpacePage(BasePage):
+class UserSpacePage(Page):
     pass
 
-class EmptyPage(BasePage):
+class EmptyPage(Page):
     pass
 
-class AccountsPage(BasePage):
+class AccountsPage(Page):
     TYPES = {'C/C':             Account.TYPE_CHECKING,
              'Livret':          Account.TYPE_SAVINGS,
              'Pret':            Account.TYPE_LOAN,
@@ -112,7 +111,7 @@ class Transaction(FrenchTransaction):
                 (re.compile('^Versamento .*'),FrenchTransaction.TYPE_DEPOSIT),
                ]
 
-class OperationsPage(BasePage):
+class OperationsPage(Page):
     def get_history(self):
         p = re.compile(".*movimenti-conto$")
         if p.match(self.browser.geturl()):
