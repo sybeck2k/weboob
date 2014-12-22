@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
+
 from .browser import FinecoBrowser
 from decimal import Decimal
-import string
 
 from weboob.capabilities.bank import CapBank, AccountNotFound, Recipient, Account
 from weboob.tools.backend import Module, BackendConfig
@@ -28,13 +28,15 @@ from weboob.tools.value import ValueBackendPassword
 __all__ = ['FinecoModule']
 
 
+
+
 class FinecoModule(Module, CapBank):
     NAME = 'fineco'
     DESCRIPTION = u'Fineco banking (Italy)'
     MAINTAINER = u'Roberto Migli'
     EMAIL = 'robertomigli@gmail.com'
     LICENSE = 'AGPLv3+'
-    VERSION = '1.0'
+    VERSION = '1.1'
     CONFIG = BackendConfig(ValueBackendPassword('login',    label='Identifiant', regexp='^\d{1,13}\w$', masked=False),
                            ValueBackendPassword('password', label='Mot de passe'))
 
