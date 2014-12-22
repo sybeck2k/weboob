@@ -18,7 +18,7 @@
 # along with weboob. If not, see <http://www.gnu.org/licenses/>.
 
 
-from .backend import FinecoBackend
+from .module import FinecoModule
 
 
-__all__ = ['FinecoBackend']
+__all__ = ['FinecoModule']
