@@ -21,7 +21,7 @@
 from urlparse import urlsplit, parse_qsl, urlparse
 from datetime import datetime, timedelta
 
-from weboob.tools.deprecated.browser import BaseBrowser, BrowserIncorrectPassword
+from weboob.deprecated.browser import BaseBrowser, BrowserIncorrectPassword
 from weboob.capabilities.bank import Transfer, TransferError
 
 from .pages import LoginPage, LoginErrorPage, AccountsPage, EmptyPage, OperationsPage

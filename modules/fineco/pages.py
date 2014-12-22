@@ -27,7 +27,7 @@ from datetime import datetime
 import datetime
 import hashlib
 
-from weboob.tools.deprecated.browser import BasePage, BrowserIncorrectPassword, BrokenPageError
+from weboob.deprecated.browser import BasePage, BrowserIncorrectPassword, BrokenPageError
 from weboob.tools.ordereddict import OrderedDict
 from weboob.capabilities.bank import Account
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
