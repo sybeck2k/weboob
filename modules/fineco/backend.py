@@ -22,13 +22,13 @@ from decimal import Decimal
 import string
 
 from weboob.capabilities.bank import CapBank, AccountNotFound, Recipient, Account
-from weboob.tools.backend import BaseBackend, BackendConfig
+from weboob.tools.backend import Backend, BackendConfig
 from weboob.tools.value import ValueBackendPassword
 
 __all__ = ['FinecoBackend']
 
 
-class FinecoBackend(BaseBackend, CapBank):
+class FinecoBackend(Backend, CapBank):
     NAME = 'fineco'
     DESCRIPTION = u'Fineco banking (Italy)'
     MAINTAINER = u'Roberto Migli'
