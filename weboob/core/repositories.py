@@ -765,7 +765,7 @@ class Keyring(object):
             return os.getenv('GPGV_EXECUTABLE')
         paths = os.getenv('PATH', os.defpath).split(os.pathsep)
         for path in paths:
-            for ex in ('gpgv2', 'gpgv'):
+            for ex in ('gpgv2', 'gpgv', 'gpgv2.exe', 'gpgv.exe'):
                 fpath = os.path.join(path, ex)
                 if os.path.exists(fpath) and os.access(fpath, os.X_OK):
                     return fpath
@@ -777,21 +777,30 @@ class Keyring(object):
         """
         gpgv = self.find_gpgv()
         from tempfile import NamedTemporaryFile
-        with NamedTemporaryFile(suffix='.sig') as sigfile:
-            sigfile.write(sigdata)
-            sigfile.flush()  # very important
-            assert isinstance(data, basestring)
-            # Yes, all of it is necessary
-            proc = subprocess.Popen([gpgv,
-                    '--status-fd', '1',
-                    '--keyring', os.path.realpath(self.path),
-                    os.path.realpath(sigfile.name),
-                    '-'],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            out, err = proc.communicate(data)
-            if proc.returncode or 'GOODSIG' not in out or 'VALIDSIG' not in out:
+        with NamedTemporaryFile(suffix='.sig', delete=False) as sigfile:
+            temp_filename = sigfile.name
+            return_code = None
+            out = ''
+            err = ''
+            try:
+                sigfile.write(sigdata)
+                sigfile.flush()  # very important
+                assert isinstance(data, basestring)
+                # Yes, all of it is necessary
+                proc = subprocess.Popen([gpgv,
+                        '--status-fd', '1',
+                        '--keyring', os.path.realpath(self.path),
+                        os.path.realpath(sigfile.name),
+                        '-'],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE)
+                out, err = proc.communicate(data)
+                return_code = proc.returncode
+            finally:
+                os.unlink(temp_filename)
+
+            if return_code or 'GOODSIG' not in out or 'VALIDSIG' not in out:
                 print(out, err, file=sys.stderr)
                 return False
         return True

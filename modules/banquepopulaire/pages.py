@@ -22,11 +22,14 @@ import datetime
 from urlparse import urlsplit, parse_qsl
 from decimal import Decimal
 import re
+import urllib
 from mechanize import Cookie, FormNotFoundError
 
-from weboob.deprecated.browser import Page as _BasePage, BrowserUnavailable, BrokenPageError
+from weboob.exceptions import BrowserUnavailable, BrowserIncorrectPassword
+from weboob.deprecated.browser import Page as _BasePage, BrokenPageError
 from weboob.capabilities.bank import Account
 from weboob.tools.capabilities.bank.transactions import FrenchTransaction
+from weboob.tools.json import json
 
 
 class WikipediaARC4(object):
@@ -56,6 +59,50 @@ class WikipediaARC4(object):
 class BasePage(_BasePage):
     def get_token(self):
         return self.parser.select(self.document.getroot(), '//form//input[@name="token"]', 1, 'xpath').attrib['value']
+
+    def build_token(self, token):
+        """
+        These fucking faggots have introduced a new protection on the token.
+
+        Each time there is a call to SAB (selectActionButton), the token
+        available in the form is modified with a key available in JS:
+
+        ipsff(function(){TW().ipthk([12, 25, 17, 5, 23, 26, 15, 30, 6]);});
+
+        Each value of the array is an index for the current token to append the
+        char at this position at the end of the token.
+        """
+        table = None
+        for script in self.document.xpath('//script'):
+            if script.text is None:
+                continue
+            m = re.search(r'ipthk\(([^\)]+)\)', script.text, flags=re.MULTILINE)
+            if m:
+                table = json.loads(m.group(1))
+        if table is None:
+            return token
+
+        for i in table:
+            token += token[i]
+        return token
+
+    def get_params(self):
+        params = {}
+        for field in self.document.xpath('//input'):
+            params[field.attrib['name']] = field.attrib.get('value', '')
+        return params
+
+    def get_button_actions(self):
+        actions = {}
+        for script in self.document.xpath('//script'):
+            if script.text is None:
+                continue
+
+            for id, action, strategy in re.findall(r'''attEvt\(window,"(?P<id>[^"]+)","click","sab\('(?P<action>[^']+)','(?P<strategy>[^']+)'\);"''', script.text, re.MULTILINE):
+                actions[id] = {'dialogActionPerformed': action,
+                               'validationStrategy': strategy,
+                              }
+        return actions
 
 
 class RedirectPage(BasePage):
@@ -171,6 +218,38 @@ class LoginPage(BasePage):
         self.browser.submit(nologin=True)
 
 
+class Login2Page(LoginPage):
+    @property
+    def request_url(self):
+        transactionID = self.group_dict['transactionID']
+        return 'https://www.icgauth.banquepopulaire.fr/dacswebssoissuer/api/v1u0/transaction/%s' % transactionID
+
+    def on_loaded(self):
+        r = self.browser.openurl(self.request_url)
+        doc = json.load(r)
+        self.form_id = doc['step']['validationUnits'][0]['PASSWORD_LOOKUP'][0]['id']
+
+    def login(self, login, password):
+        payload = {'validate': {'PASSWORD_LOOKUP': [{'id': self.form_id,
+                                                     'login': login.encode(self.browser.ENCODING).upper(),
+                                                     'password': password.encode(self.browser.ENCODING),
+                                                     'type': 'PASSWORD_LOOKUP'
+                                                    }]
+                               }
+                  }
+        req = self.browser.request_class(self.request_url + '/step')
+        req.add_header('Content-Type', 'application/json')
+        r = self.browser.openurl(req, json.dumps(payload))
+
+        doc = json.load(r)
+        self.logger.debug(doc)
+        if ('phase' in doc and doc['phase']['previousResult'] == 'FAILED_AUTHENTICATION') or \
+           doc['response']['status'] != 'AUTHENTICATION_SUCCESS':
+            raise BrowserIncorrectPassword()
+
+        self.browser.location(doc['response']['saml2_post']['action'], urllib.urlencode({'SAMLResponse': doc['response']['saml2_post']['samlResponse']}))
+
+
 class IndexPage(BasePage):
     def get_token(self):
         url = self.document.getroot().xpath('//frame[@name="portalHeader"]')[0].attrib['src']
@@ -215,14 +294,18 @@ class HomePage(BasePage):
 
 
 class AccountsPage(BasePage):
-    ACCOUNT_TYPES = {u'Mes comptes d\'épargne':     Account.TYPE_SAVINGS,
-                     u'Mon épargne':                Account.TYPE_SAVINGS,
-                     u'Placements':                 Account.TYPE_SAVINGS,
-                     u'Mes comptes':                Account.TYPE_CHECKING,
-                     u'Comptes en euros':           Account.TYPE_CHECKING,
-                     u'Mes emprunts':               Account.TYPE_LOAN,
-                     u'Financements':               Account.TYPE_LOAN,
-                     u'Mes services':               None,    # ignore this kind of accounts (no bank ones)
+    ACCOUNT_TYPES = {u'Mes comptes d\'épargne':        Account.TYPE_SAVINGS,
+                     u'Mon épargne':                   Account.TYPE_SAVINGS,
+                     u'Placements':                    Account.TYPE_SAVINGS,
+                     u'Liste complète de mon épargne': Account.TYPE_SAVINGS,
+                     u'Mes comptes':                   Account.TYPE_CHECKING,
+                     u'Comptes en euros':              Account.TYPE_CHECKING,
+                     u'Liste complète de mes comptes': Account.TYPE_CHECKING,
+                     u'Mes emprunts':                  Account.TYPE_LOAN,
+                     u'Financements':                  Account.TYPE_LOAN,
+                     u'Mes services':                  None,    # ignore this kind of accounts (no bank ones)
+                     u'Équipements':                   None,    # ignore this kind of accounts (no bank ones)
+                     u'Synthèse':                      None,    # ignore this title
                     }
 
     def is_error(self):
@@ -246,17 +329,25 @@ class AccountsPage(BasePage):
     def iter_accounts(self, next_pages):
         account_type = Account.TYPE_UNKNOWN
 
-        params = {}
-        for field in self.document.xpath('//input'):
-            params[field.attrib['name']] = field.attrib.get('value', '')
+        params = self.get_params()
+        actions = self.get_button_actions()
 
         for div in self.document.getroot().cssselect('div.btit'):
-            if div.text is None:
+            if div.text in (None, u'Synthèse'):
                 continue
             account_type = self.ACCOUNT_TYPES.get(div.text.strip(), Account.TYPE_UNKNOWN)
 
             if account_type is None:
                 # ignore services accounts
+                continue
+
+            # Go to the full list of this kind of account, if any.
+            btn = div.getparent().xpath('.//button/span[text()="Suite"]')
+            if len(btn) > 0:
+                btn = btn[0].getparent()
+                _params = params.copy()
+                _params.update(actions[btn.attrib['id']])
+                next_pages.append(_params)
                 continue
 
             currency = None
@@ -300,9 +391,24 @@ class AccountsPage(BasePage):
                 if len(tds) >= 5 and len(tds[self.COL_COMING].xpath('.//a')) > 0:
                     _params = account._params.copy()
                     _params['dialogActionPerformed'] = 'ENCOURS_COMPTE'
+
+                    # If there is an action needed before going to the cards page, save it.
+                    m = re.search('dialogActionPerformed=([\w_]+)', self.url)
+                    if m and m.group(1) != 'EQUIPEMENT_COMPLET':
+                        _params['prevAction'] = m.group(1)
                     next_pages.append(_params)
                 yield account
 
+        # Needed to preserve navigation.
+        btn = self.document.xpath('.//button/span[text()="Retour"]')
+        if len(btn) > 0:
+            btn = btn[0].getparent()
+            _params = params.copy()
+            _params.update(actions[btn.attrib['id']])
+            self.browser.openurl('/cyber/internet/ContinueTask.do', urllib.urlencode(_params))
+
+class AccountsFullPage(AccountsPage):
+    pass
 
 class CardsPage(BasePage):
     COL_ID = 0
@@ -311,10 +417,8 @@ class CardsPage(BasePage):
     COL_DATE = 3
     COL_AMOUNT = 4
 
-    def iter_accounts(self):
-        params = {}
-        for field in self.document.xpath('//input'):
-            params[field.attrib['name']] = field.attrib.get('value', '')
+    def iter_accounts(self, next_pages):
+        params = self.get_params()
 
         account = None
         for tr in self.document.xpath('//table[@id="TabCtes"]/tbody/tr'):
@@ -326,11 +430,13 @@ class CardsPage(BasePage):
                     yield account
                 account = Account()
                 account.id = id.replace(' ', '')
+                account.type = Account.TYPE_CARD
                 account.balance = account.coming = Decimal('0')
                 account._next_debit = datetime.date.today()
                 account._prev_debit = datetime.date(2000,1,1)
                 account.label = u' '.join([self.parser.tocleanstring(cols[self.COL_TYPE]),
                                            self.parser.tocleanstring(cols[self.COL_LABEL])])
+                account._params = None
                 account._coming_params = params.copy()
                 account._coming_params['dialogActionPerformed'] = 'SELECTION_ENCOURS_CARTE'
                 account._coming_params['attribute($SEL_$%s)' % tr.attrib['id'].split('_')[0]] = tr.attrib['id'].split('_', 1)[1]
@@ -363,6 +469,15 @@ class CardsPage(BasePage):
 
         if account is not None:
             yield account
+
+        # Needed to preserve navigation.
+        btn = self.document.xpath('.//button/span[text()="Retour"]')
+        if len(btn) > 0:
+            btn = btn[0].getparent()
+            actions = self.get_button_actions()
+            _params = params.copy()
+            _params.update(actions[btn.attrib['id']])
+            self.browser.openurl('/cyber/internet/ContinueTask.do', urllib.urlencode(_params))
 
 
 class Transaction(FrenchTransaction):
